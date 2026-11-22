@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Interactivo: Cadena de Valor de 5 Pasos con Analítica de Datos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Estilos personalizados para el efecto dominó y animaciones */
+        .domino-card {
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom right;
+        }
+
+        .domino-fallen {
+            transform: rotate(22deg) translateY(8px);
+            box-shadow: -8px 10px 18px rgba(15, 23, 42, 0.15);
+        }
+
+        .domino-blocked {
+            animation: shakeBlocked 0.55s ease-in-out;
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25);
+        }
+
+        @keyframes shakeBlocked {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px) rotate(-2deg); }
+            40% { transform: translateX(6px) rotate(2deg); }
+            60% { transform: translateX(-4px) rotate(-1deg); }
+            80% { transform: translateX(4px) rotate(1deg); }
+        }
+
+        .chip-draggable {
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .chip-draggable:active {
+            cursor: grabbing;
+            transform: scale(0.97);
+        }
+
+        .drop-zone-active {
+            background-color: #ccfbf1 !important;
+            border-color: #0d9488 !important;
+            transform: scale(1.02);
+        }
+
+        /* Estilos optimizados para Impresión / PDF de Evidencia */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #print-area {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .page-break-inside-avoid {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Notificación Toast Flotante (Reemplazo de alert) -->
+    <div id="toast-notification" class="no-print fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
+        <div class="bg-[#0f172a] text-white px-5 py-3.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 max-w-md">
+            <span id="toast-icon" class="text-[#0d9488]"></span>
+            <p id="toast-message" class="text-sm font-medium leading-snug"></p>
+        </div>
+    </div>
+
+    <!-- ENCABEZADO EJECUTIVO -->
+    <header class="no-print bg-[#0f172a] text-white shadow-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-950/80 border border-teal-700/50 text-[#2dd4bf] text-xs font-semibold tracking-wide uppercase mb-2">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        CertiProf DSTPC • Data Storytelling para la Toma de Decisiones
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                        Laboratorio Interactivo: Cadena de Valor de 5 Pasos con Analítica de Datos
+                    </h1>
+                    <p class="text-slate-300 text-sm sm:text-base mt-1 flex items-center gap-2">
+                        <span class="text-[#f59e0b] font-semibold">Adaptado de Brent Dykes</span>
+                        <span>•</span>
+                        <span class="italic text-slate-300">«Sin acción, los insights son simplemente números vacíos» — Stephen Few</span>
+                    </p>
+                </div>
+
+                <!-- Campo Nombre Estudiante / Equipo -->
+                <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 min-w-[280px] sm:min-w-[320px]">
+                    <label for="student-name" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                        Nombre del Estudiante o Equipo
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="student-name" placeholder="Ej. Ana María Gómez / Equipo Alfa"
+                            oninput="saveState()"
+                            class="w-full bg-[#0f172a] text-white placeholder-slate-500 text-sm rounded-lg px-3.5 py-2 border border-slate-600 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Progreso y Navegación de Etapas -->
+            <div class="mt-6 pt-5 border-t border-slate-800">
+                <div class="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                    <span>Progreso del Laboratorio de Aprendizaje</span>
+                    <span id="progress-text" class="text-[#2dd4bf] font-bold">0% Completado</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2 mb-5 overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-[#0d9488] to-teal-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+
+                <!-- Pestañas de Navegación -->
+                <nav class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5" aria-label="Etapas del laboratorio">
+                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-[#0d9488] text-white border-teal-500 shadow-md">
+                        <span class="flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">1</span>
+                            Ordenamiento y Definición
+                        </span>
+                        <span id="badge-step-1" class="text-xs px-2 py-0.5 rounded-full bg-black/20">Pendiente</span>
+                    </button>
+
+                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800">
+                        <span class="flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">2</span>
+                            Diagnóstico «Fichas Caídas»
+                        </span>
+                        <span id="badge-step-2" class="text-xs px-2 py-0.5 rounded-full bg-slate-700">Pendiente</span>
+                    </button>
+
+                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800">
+                        <span class="flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">3</span>
+                            Mapeo de Caso Práctico
+                        </span>
+                        <span id="badge-step-3" class="text-xs px-2 py-0.5 rounded-full bg-slate-700">Pendiente</span>
+                    </button>
+
+                    <button onclick="switchTab(4)" id="tab-btn-4" class="tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-amber-500/10 text-[#f59e0b] border-amber-500/40 hover:bg-amber-500/20">
+                        <span class="flex items-center gap-2.5">
+                            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+                            Generar Evidencia Final
+                        </span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ===================================================================== -->
+        <!-- ETAPA 1: ORDENAMIENTO Y DEFINICIÓN CONCEPTUAL (EL EFECTO DOMINÓ)      -->
+        <!-- ===================================================================== -->
+        <section id="step-1" class="no-print space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#0d9488]">Etapa 1 • Nivel Conceptual</span>
+                        <h2 class="text-xl font-bold text-[#0f172a] mt-0.5">Ordenamiento y Definición Operativa (El Efecto Dominó)</h2>
+                        <p class="text-sm text-slate-600 mt-1">
+                            Reconstruye la progresión obligatoria de Brent Dykes arrastrando (o haciendo clic) cada etiqueta hacia su ficha de dominó correspondiente (1 al 5) y redacta con tus palabras qué ocurre en cada eslabón.
+                        </p>
+                    </div>
+                    <button onclick="resetStep1()" class="self-start md:self-center inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0f172a] bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-lg transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        Reiniciar Fichas
+                    </button>
+                </div>
+
+                <!-- Banco de Etiquetas Desordenadas -->
+                <div class="mt-5 bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <i data-lucide="grip-horizontal" class="w-4 h-4 text-[#0d9488]"></i>
+                            Banco de Eslabones (Arrastra hacia la ficha o haz clic para asignar al siguiente espacio libre)
+                        </span>
+                        <span class="text-xs text-slate-400 hidden sm:inline">Tip: Haz clic en una ficha asignada para devolverla</span>
+                    </div>
+                    <div id="word-bank" class="flex flex-wrap gap-2.5 min-h-[44px]">
+                        <!-- Se renderiza dinámicamente con JS -->
+                    </div>
+                </div>
+
+                <!-- Fila de 5 Fichas de Dominó + Meta Final de Valor -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-stretch">
+                    <!-- Fichas 1 a 5 generadas dinámicamente -->
+                    <div id="domino-slots-container" class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                        <!-- Slots 1..5 -->
+                    </div>
+
+                    <!-- Meta Final: VALOR DE NEGOCIO -->
+                    <div class="lg:col-span-1 flex flex-col justify-between bg-gradient-to-b from-[#0f172a] to-slate-800 text-white rounded-2xl p-4 border-2 border-[#0d9488] shadow-md relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#2dd4bf]">Meta Final</span>
+                            <i data-lucide="trophy" class="w-5 h-5 text-[#f59e0b]"></i>
+                        </div>
+                        <div class="my-4 text-center">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-[#0d9488]/20 border border-[#0d9488] flex items-center justify-center mb-2">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-[#2dd4bf]"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base tracking-tight text-white">VALOR DE NEGOCIO</h3>
+                            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                                Impacto tangible: incremento de ganancias, reducción de costos o mitigación de riesgos.
+                            </p>
+                        </div>
+                        <div class="text-[11px] text-center text-teal-300 font-medium bg-white/5 py-1.5 px-2 rounded-lg">
+                            Solo ocurre si caen las 5 fichas
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Verificación -->
+                <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div id="step1-feedback-banner" class="text-sm font-medium text-slate-600">
+                        Completa las 5 fichas y sus definiciones operativas para validar tu secuencia.
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button onclick="verifyStep1()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-teal-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            Verificar Secuencia y Comparar Definiciones
+                        </button>
+                        <button onclick="switchTab(2)" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-[#0f172a] hover:bg-slate-800 text-white font-semibold px-4 py-2.5 rounded-xl transition">
+                            Siguiente Etapa
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Panel de Referencia Oficial Brent Dykes (Se despliega al verificar) -->
+                <div id="official-definitions-panel" class="hidden mt-6 bg-teal-50/70 border border-teal-200 rounded-2xl p-5">
+                    <div class="flex items-center gap-2 text-[#0f172a] font-bold text-base mb-3">
+                        <i data-lucide="book-open-check" class="w-5 h-5 text-[#0d9488]"></i>
+                        Definiciones Oficiales de Referencia (Brent Dykes — Guía DSTPC)
+                    </div>
+                    <p class="text-xs text-slate-600 mb-4">
+                        Compara tus definiciones operativas con el estándar conceptual del curso:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        <div class="bg-white p-3.5 rounded-xl border border-teal-100 shadow-sm">
+                            <span class="text-xs font-bold text-[#0d9488]">1. DATOS</span>
+                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">Hechos crudos recolectados sin procesar ni contextualizar.</p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-teal-100 shadow-sm">
+                            <span class="text-xs font-bold text-[#0d9488]">2. INFORMACIÓN</span>
+                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">Datos organizados, estructurados y agregados para dar contexto.</p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-teal-100 shadow-sm">
+                            <span class="text-xs font-bold text-[#0d9488]">3. INSIGHTS</span>
+                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">Descubrimiento de un nuevo patrón, anomalía o relación inesperada.</p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-teal-100 shadow-sm">
+                            <span class="text-xs font-bold text-[#0d9488]">4. DECISIONES</span>
+                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">La elección informada y consciente de qué rumbo estratégico tomar.</p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-teal-100 shadow-sm">
+                            <span class="text-xs font-bold text-[#0d9488]">5. ACCIÓN</span>
+                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">La ejecución e implementación real de dicho cambio en el negocio (lo que culmina en Valor).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- ETAPA 2: DIAGNÓSTICO DE «FICHAS CAÍDAS» (CUELLO DE BOTELLA)           -->
+        <!-- ===================================================================== -->
+        <section id="step-2" class="no-print hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="border-b border-slate-100 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#f59e0b]">Etapa 2 • Nivel Reflexivo y Organizacional</span>
+                    <h2 class="text-xl font-bold text-[#0f172a] mt-0.5">Diagnóstico de «Fichas Caídas» (Simulador de Cuello de Botella)</h2>
+                    <p class="text-sm text-slate-600 mt-1">
+                        Selecciona en qué punto exacto suele detenerse o «romperse» el efecto dominó en tu organización o proyectos habituales y ejecuta la simulación visual.
+                    </p>
+                </div>
+
+                <!-- Selector de Escenario de Ruptura -->
+                <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <button onclick="selectBottleneck(1)" id="bn-card-1" class="bn-option text-left p-4 rounded-xl border-2 border-slate-200 hover:border-[#0d9488] bg-slate-50/60 transition flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#f59e0b] font-bold flex items-center justify-center shrink-0 mt-0.5">A</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-[#0f172a]">Estancamiento entre Información e Insights</h3>
+                            <p class="text-xs text-slate-600 mt-1">Se generan muchas tablas, reportes y dashboards descriptivos, pero nadie descubre patrones nuevos ni anomalías accionables.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectBottleneck(2)" id="bn-card-2" class="bn-option text-left p-4 rounded-xl border-2 border-slate-200 hover:border-[#0d9488] bg-slate-50/60 transition flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#f59e0b] font-bold flex items-center justify-center shrink-0 mt-0.5">B</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-[#0f172a]">Estancamiento entre Insights y Decisiones</h3>
+                            <p class="text-xs text-slate-600 mt-1">Se descubre un hallazgo relevante, pero la cultura, la política interna, la tradición o una mala comunicación frenan la toma de decisión.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectBottleneck(3)" id="bn-card-3" class="bn-option text-left p-4 rounded-xl border-2 border-slate-200 hover:border-[#0d9488] bg-slate-50/60 transition flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#f59e0b] font-bold flex items-center justify-center shrink-0 mt-0.5">C</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-[#0f172a]">Estancamiento entre Decisiones y Acción</h3>
+                            <p class="text-xs text-slate-600 mt-1">En la reunión directiva se acuerda cambiar el rumbo, pero el plan nunca se ejecuta ni se implementa en la operación diaria.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectBottleneck(4)" id="bn-card-4" class="bn-option text-left p-4 rounded-xl border-2 border-slate-200 hover:border-[#0d9488] bg-slate-50/60 transition flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-teal-100 text-[#0d9488] font-bold flex items-center justify-center shrink-0 mt-0.5">D</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-[#0f172a]">Flujo Completo sin Interrupciones</h3>
+                            <p class="text-xs text-slate-600 mt-1">Todas las fichas caen secuencialmente: los datos se transforman en narrativa persuasiva y culminan en acción y Valor.</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Escenario Animado de Simulación Dominó -->
+                <div class="mt-6 bg-[#0f172a] rounded-2xl p-6 text-white relative overflow-hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#2dd4bf]">Simulador Visual de Impacto</span>
+                            <p id="sim-status-text" class="text-sm text-slate-300 mt-0.5">Selecciona un escenario arriba y presiona «Simular Efecto Dominó».</p>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="resetSimulation()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition">
+                                Resetear Fichas
+                            </button>
+                            <button onclick="runDominoSimulation()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#f59e0b] hover:bg-amber-500 text-[#0f172a] font-extrabold text-sm shadow-lg transition">
+                                ▶ Simular Efecto Dominó
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pista de las 6 fichas (5 pasos + Valor) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 py-4 px-2">
+                        <div id="sim-domino-1" class="domino-card bg-slate-800 border-2 border-slate-600 rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400">FICHA 1</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#0d9488]"></span>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="database" class="w-7 h-7 mx-auto text-teal-400 mb-1.5"></i>
+                                <div class="font-bold text-sm">1. DATOS</div>
+                            </div>
+                            <div id="sim-tag-1" class="text-[11px] text-center text-slate-400">Listo</div>
+                        </div>
+
+                        <div id="sim-domino-2" class="domino-card bg-slate-800 border-2 border-slate-600 rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400">FICHA 2</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#0d9488]"></span>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="bar-chart-3" class="w-7 h-7 mx-auto text-teal-400 mb-1.5"></i>
+                                <div class="font-bold text-sm">2. INFORMACIÓN</div>
+                            </div>
+                            <div id="sim-tag-2" class="text-[11px] text-center text-slate-400">Listo</div>
+                        </div>
+
+                        <div id="sim-domino-3" class="domino-card bg-slate-800 border-2 border-slate-600 rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400">FICHA 3</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#0d9488]"></span>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="lightbulb" class="w-7 h-7 mx-auto text-amber-400 mb-1.5"></i>
+                                <div class="font-bold text-sm">3. INSIGHTS</div>
+                            </div>
+                            <div id="sim-tag-3" class="text-[11px] text-center text-slate-400">Listo</div>
+                        </div>
+
+                        <div id="sim-domino-4" class="domino-card bg-slate-800 border-2 border-slate-600 rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400">FICHA 4</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#0d9488]"></span>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="compass" class="w-7 h-7 mx-auto text-sky-400 mb-1.5"></i>
+                                <div class="font-bold text-sm">4. DECISIONES</div>
+                            </div>
+                            <div id="sim-tag-4" class="text-[11px] text-center text-slate-400">Listo</div>
+                        </div>
+
+                        <div id="sim-domino-5" class="domino-card bg-slate-800 border-2 border-slate-600 rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400">FICHA 5</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#0d9488]"></span>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="rocket" class="w-7 h-7 mx-auto text-emerald-400 mb-1.5"></i>
+                                <div class="font-bold text-sm">5. ACCIÓN</div>
+                            </div>
+                            <div id="sim-tag-5" class="text-[11px] text-center text-slate-400">Listo</div>
+                        </div>
+
+                        <div id="sim-domino-6" class="domino-card bg-gradient-to-br from-teal-900 to-slate-800 border-2 border-[#0d9488] rounded-xl p-4 flex flex-col justify-between min-h-[155px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-[#2dd4bf]">META</span>
+                                <i data-lucide="award" class="w-4 h-4 text-[#f59e0b]"></i>
+                            </div>
+                            <div class="my-2 text-center">
+                                <i data-lucide="gem" class="w-7 h-7 mx-auto text-[#f59e0b] mb-1.5"></i>
+                                <div class="font-extrabold text-sm text-white">VALOR</div>
+                            </div>
+                            <div id="sim-tag-6" class="text-[11px] text-center text-teal-300">En espera</div>
+                        </div>
+                    </div>
+
+                    <!-- Banner de Alerta / Resultado de Simulación -->
+                    <div id="sim-alert-box" class="hidden mt-3 p-4 rounded-xl border text-sm flex items-start gap-3">
+                        <i id="sim-alert-icon" data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <div id="sim-alert-content"></div>
+                    </div>
+                </div>
+
+                <!-- Campos Editables de Reflexión Organizacional -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="reflection-barriers" class="block text-sm font-bold text-[#0f172a] mb-1.5">
+                            1. ¿Qué factores organizacionales (cultura, política interna, tradición o falta de comunicación) provocan esta ruptura en tu contexto?
+                        </label>
+                        <textarea id="reflection-barriers" rows="4" oninput="saveState()"
+                            placeholder="Describe las barreras reales que impiden avanzar en ese punto de la cadena..."
+                            class="w-full rounded-xl border border-slate-300 p-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-teal-500/20 transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="reflection-solution" class="block text-sm font-bold text-[#0f172a] mb-1.5">
+                            2. ¿Cómo puede el Data Storytelling (combinando datos, narrativa y visualización) desbloquear esta ficha?
+                        </label>
+                        <textarea id="reflection-solution" rows="4" oninput="saveState()"
+                            placeholder="Explica qué estrategia narrativa o visual aplicarías para crear sentido de urgencia y lograr acción..."
+                            class="w-full rounded-xl border border-slate-300 p-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-teal-500/20 transition"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-slate-100 flex justify-between items-center">
+                    <button onclick="switchTab(1)" class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-[#0f172a] px-4 py-2 rounded-xl transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Etapa Anterior
+                    </button>
+                    <button onclick="switchTab(3)" class="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl transition">
+                        Continuar a Etapa 3
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- ETAPA 3: LIENZO DE MAPEO DE CASO PRÁCTICO                           -->
+        <!-- ===================================================================== -->
+        <section id="step-3" class="no-print hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#0d9488]">Etapa 3 • Nivel Práctico Aplicado</span>
+                        <h2 class="text-xl font-bold text-[#0f172a] mt-0.5">Lienzo de Mapeo de Caso Práctico</h2>
+                        <p class="text-sm text-slate-600 mt-1">
+                            Aplica la cadena completa de 6 pasos a un caso real de tu institución/empresa, o explora primero el caso modelo de la guía de CertiProf.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button onclick="loadModelCase()" class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold text-xs px-3.5 py-2.5 rounded-xl transition">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-[#f59e0b]"></i>
+                            Cargar Ejemplo Modelo (Caso Ventas Minoristas)
+                        </button>
+                        <button onclick="clearCaseCanvas()" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3.5 py-2.5 rounded-xl transition">
+                            <i data-lucide="eraser" class="w-4 h-4"></i>
+                            Limpiar Lienzo para Mi Caso
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Título del Caso Práctico -->
+                <div class="mt-5">
+                    <label for="case-title" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                        Título o Contexto del Caso Analizado
+                    </label>
+                    <input type="text" id="case-title" oninput="saveState()"
+                        placeholder="Ej. Optimización de retención de clientes en banca digital / Caso Ventas Minoristas"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-[#0f172a] focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-teal-500/20">
+                </div>
+
+                <!-- Grid de 6 Tarjetas Conectadas -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- 1. DATO -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
+                                <span class="w-6 h-6 rounded-lg bg-[#0f172a] text-white flex items-center justify-center text-xs">1</span>
+                                Dato (Hechos Crudos)
+                            </span>
+                            <i data-lucide="database" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <textarea id="case-step-1" rows="4" oninput="saveState()"
+                            placeholder="¿Qué registros, métricas crudas o transacciones recolectaste?"
+                            class="w-full flex-grow rounded-xl bg-white border border-slate-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488]"></textarea>
+                    </div>
+
+                    <!-- 2. INFORMACIÓN -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
+                                <span class="w-6 h-6 rounded-lg bg-[#0f172a] text-white flex items-center justify-center text-xs">2</span>
+                                Información (Contexto)
+                            </span>
+                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <textarea id="case-step-2" rows="4" oninput="saveState()"
+                            placeholder="¿Cómo organizaste o visualizaste esos datos para darles contexto?"
+                            class="w-full flex-grow rounded-xl bg-white border border-slate-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488]"></textarea>
+                    </div>
+
+                    <!-- 3. INSIGHT -->
+                    <div class="bg-amber-50/50 rounded-2xl p-4 border border-amber-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-amber-900">
+                                <span class="w-6 h-6 rounded-lg bg-[#f59e0b] text-white flex items-center justify-center text-xs">3</span>
+                                Insight (Hallazgo Clave)
+                            </span>
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-[#f59e0b]"></i>
+                        </div>
+                        <textarea id="case-step-3" rows="4" oninput="saveState()"
+                            placeholder="¿Qué patrón nuevo, anomalía o causa raíz inesperada descubriste?"
+                            class="w-full flex-grow rounded-xl bg-white border border-amber-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#f59e0b]"></textarea>
+                    </div>
+
+                    <!-- 4. DECISIÓN -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
+                                <span class="w-6 h-6 rounded-lg bg-[#0f172a] text-white flex items-center justify-center text-xs">4</span>
+                                Decisión Estratégica
+                            </span>
+                            <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <textarea id="case-step-4" rows="4" oninput="saveState()"
+                            placeholder="¿Qué rumbo o resolución informada tomó la dirección a partir del insight?"
+                            class="w-full flex-grow rounded-xl bg-white border border-slate-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488]"></textarea>
+                    </div>
+
+                    <!-- 5. ACCIÓN -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
+                                <span class="w-6 h-6 rounded-lg bg-[#0f172a] text-white flex items-center justify-center text-xs">5</span>
+                                Acción (Ejecución)
+                            </span>
+                            <i data-lucide="play-circle" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <textarea id="case-step-5" rows="4" oninput="saveState()"
+                            placeholder="¿Qué iniciativas concretas se implementaron en la operación?"
+                            class="w-full flex-grow rounded-xl bg-white border border-slate-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488]"></textarea>
+                    </div>
+
+                    <!-- 6. VALOR GENERADO -->
+                    <div class="bg-teal-50/70 rounded-2xl p-4 border-2 border-[#0d9488] flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">
+                                <span class="w-6 h-6 rounded-lg bg-[#0d9488] text-white flex items-center justify-center text-xs">6</span>
+                                Valor Generado (Retorno)
+                            </span>
+                            <i data-lucide="trophy" class="w-4 h-4 text-[#0d9488]"></i>
+                        </div>
+                        <textarea id="case-step-6" rows="4" oninput="saveState()"
+                            placeholder="¿Cuál fue el impacto medible en ingresos, ahorros o mitigación de riesgos?"
+                            class="w-full flex-grow rounded-xl bg-white border border-teal-200 p-3 text-sm text-slate-800 focus:outline-none focus:border-[#0d9488]"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <button onclick="switchTab(2)" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-[#0f172a] px-4 py-2 rounded-xl transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Etapa Anterior
+                    </button>
+                    <button onclick="switchTab(4)" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition">
+                        <i data-lucide="file-check-2" class="w-4 h-4"></i>
+                        Consolidar y Generar Evidencia Final
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- ETAPA 4: REPORTE / EVIDENCIA FINAL PARA PORTAFOLIO Y MOODLE           -->
+        <!-- ===================================================================== -->
+        <section id="step-4" class="hidden space-y-6">
+            <!-- Barra de Acciones de Exportación (No se imprime) -->
+            <div class="no-print bg-[#0f172a] text-white rounded-2xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i data-lucide="award" class="w-5 h-5 text-[#f59e0b]"></i>
+                        Evidencia Consolidada para Portafolio y Moodle
+                    </h2>
+                    <p class="text-xs text-slate-300 mt-0.5">
+                        Revisa el resumen estructurado de tus tres etapas. Puedes guardarlo en PDF o copiar el texto formateado para pegarlo en el aula virtual.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="copySummaryToClipboard()" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 font-semibold text-sm px-4 py-2.5 rounded-xl transition">
+                        <i data-lucide="copy" class="w-4 h-4 text-[#2dd4bf]"></i>
+                        Copiar Resumen para Moodle
+                    </button>
+                    <button onclick="window.print()" class="inline-flex items-center gap-2 bg-[#0d9488] hover:bg-teal-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        Imprimir / Guardar como PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Documento Imprimible / Vista Previa de Evidencia -->
+            <div id="print-area" class="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 space-y-8">
+                <!-- Cabecera del Reporte -->
+                <div class="border-b-2 border-[#0f172a] pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#0d9488]">CertiProf DSTPC • Evidencia de Aprendizaje</p>
+                        <h1 class="text-2xl font-extrabold text-[#0f172a] mt-1">Cadena de Valor de 5 Pasos con Analítica de Datos</h1>
+                        <p class="text-xs text-slate-500 mt-1 italic">«Sin acción, los insights son simplemente números vacíos» — Stephen Few (Adaptado de Brent Dykes)</p>
+                    </div>
+                    <div class="text-left sm:text-right bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200">
+                        <div class="text-[11px] font-bold uppercase text-slate-400">Estudiante / Equipo</div>
+                        <div id="report-student-name" class="text-sm font-bold text-[#0f172a]">Sin especificar</div>
+                        <div id="report-date" class="text-[11px] text-slate-500 mt-0.5"></div>
+                    </div>
+                </div>
+
+                <!-- Sección 1 del Reporte -->
+                <div class="page-break-inside-avoid">
+                    <h3 class="text-sm font-extrabold uppercase tracking-wider text-[#0f172a] bg-slate-100 px-3.5 py-2 rounded-lg border-l-4 border-[#0d9488] mb-4">
+                        1. Secuencia Conceptual y Definiciones Operativas
+                    </h3>
+                    <div id="report-step1-grid" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </div>
+
+                <!-- Sección 2 del Reporte -->
+                <div class="page-break-inside-avoid">
+                    <h3 class="text-sm font-extrabold uppercase tracking-wider text-[#0f172a] bg-slate-100 px-3.5 py-2 rounded-lg border-l-4 border-[#f59e0b] mb-4">
+                        2. Diagnóstico Organizacional de «Fichas Caídas»
+                    </h3>
+                    <div class="bg-amber-50/60 border border-amber-200 rounded-xl p-4 mb-4">
+                        <span class="text-xs font-bold uppercase text-amber-800">Punto de Ruptura Identificado:</span>
+                        <p id="report-bottleneck-title" class="text-sm font-bold text-[#0f172a] mt-0.5">No seleccionado</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1.5">Factores Organizacionales (Cultura, Política, Tradición)</h4>
+                            <p id="report-barriers" class="text-sm text-slate-800 whitespace-pre-line">Sin completar.</p>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1.5">Estrategia de Desbloqueo mediante Data Storytelling</h4>
+                            <p id="report-solution" class="text-sm text-slate-800 whitespace-pre-line">Sin completar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3 del Reporte -->
+                <div class="page-break-inside-avoid">
+                    <h3 class="text-sm font-extrabold uppercase tracking-wider text-[#0f172a] bg-slate-100 px-3.5 py-2 rounded-lg border-l-4 border-[#0f172a] mb-4">
+                        3. Mapeo de Caso Práctico Aplicado: <span id="report-case-title" class="text-[#0d9488] normal-case font-bold">Sin título</span>
+                    </h3>
+                    <div id="report-case-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="no-print bg-white border-t border-slate-200 py-4 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <span>Curso: Data Storytelling para la Toma de Decisiones • CertiProf DSTPC</span>
+            <span>Recurso Interactivo de Aprendizaje Activo • Metodología de Brent Dykes</span>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        // =========================================================================
+        // ESTADO GLOBAL Y CONSTANTES DEL MODELO BRENT DYKES
+        // =========================================================================
+        const CORRECT_ORDER = ['Datos', 'Información', 'Insights', 'Decisiones', 'Acción'];
+        const INITIAL_BANK = ['Acción', 'Datos', 'Insights', 'Decisiones', 'Información'];
+
+        const BOTTLENECK_LABELS = {
+            1: 'Estancamiento entre Información e Insights (Muchas tablas y dashboards, pero sin nuevos descubrimientos).',
+            2: 'Estancamiento entre Insights y Decisiones (Se descubre el patrón, pero la cultura, política o tradición frenan la decisión).',
+            3: 'Estancamiento entre Decisiones y Acción (Se acuerda cambiar algo, pero nunca se ejecuta ni implementa).',
+            4: 'Flujo completo sin interrupciones (Todas las fichas caen secuencialmente hasta generar Valor).'
+        };
+
+        const MODEL_CASE = {
+            title: 'Caso Ventas Minoristas: Compradores Extranjeros para Reventa (Guía DSTPC)',
+            steps: [
+                'Registro detallado de transacciones de compra individuales en tienda física (tickets, volumen de unidades y medios de pago).',
+                'Histograma de distribución del monto y volumen de compras mostrando un segundo pico atípico en compras de alto volumen.',
+                'Identificación de clientes extranjeros que viajan exclusivamente a comprar volumen para revender en su país de origen (nuevo patrón inesperado).',
+                'Habilitar un canal mayorista/B2B específico y brindar soporte de gestión aduanera para atender formalmente a este segmento.',
+                'Lanzamiento de un programa comercial mayorista y ejecución de pilotos operativos en tiendas clave de alta afluencia.',
+                'Incremento sostenido de ingresos por ventas al por mayor y reducción de costos operativos y congestión en cajas minoristas.'
+            ]
+        };
+
+        let appState = {
+            currentTab: 1,
+            studentName: '',
+            slots: [null, null, null, null, null],
+            definitions: ['', '', '', '', ''],
+            step1Verified: false,
+            selectedBottleneck: null,
+            barriers: '',
+            solution: '',
+            caseTitle: '',
+            caseSteps: ['', '', '', '', '', '']
+        };
+
+        let draggedLabel = null;
+        let simulationTimers = [];
+
+        // =========================================================================
+        // INICIALIZACIÓN Y PERSISTENCIA LOCAL
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderWordBank();
+            renderDominoSlots();
+            restoreInputs();
+            updateProgress();
+            lucide.createIcons();
+        });
+
+        function saveState() {
+            appState.studentName = document.getElementById('student-name').value;
+            for (let i = 0; i < 5; i++) {
+                const defInput = document.getElementById(`def-input-${i}`);
+                if (defInput) appState.definitions[i] = defInput.value;
+            }
+            appState.barriers = document.getElementById('reflection-barriers').value;
+            appState.solution = document.getElementById('reflection-solution').value;
+            appState.caseTitle = document.getElementById('case-title').value;
+            for (let i = 0; i < 6; i++) {
+                const cInput = document.getElementById(`case-step-${i + 1}`);
+                if (cInput) appState.caseSteps[i] = cInput.value;
+            }
+
+            try {
+                localStorage.setItem('dstpc_value_chain_lab_v1', JSON.stringify(appState));
+            } catch (e) {
+                console.warn('No se pudo guardar en localStorage:', e);
+            }
+            updateProgress();
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('dstpc_value_chain_lab_v1');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    appState = { ...appState, ...parsed };
+                }
+            } catch (e) {
+                console.warn('No se pudo cargar estado previo:', e);
+            }
+        }
+
+        function restoreInputs() {
+            document.getElementById('student-name').value = appState.studentName || '';
+            document.getElementById('reflection-barriers').value = appState.barriers || '';
+            document.getElementById('reflection-solution').value = appState.solution || '';
+            document.getElementById('case-title').value = appState.caseTitle || '';
+            for (let i = 0; i < 6; i++) {
+                const el = document.getElementById(`case-step-${i + 1}`);
+                if (el) el.value = appState.caseSteps[i] || '';
+            }
+            if (appState.selectedBottleneck) {
+                highlightBottleneckCard(appState.selectedBottleneck);
+            }
+            if (appState.step1Verified) {
+                document.getElementById('official-definitions-panel').classList.remove('hidden');
+            }
+        }
+
+        // =========================================================================
+        // NOTIFICACIONES TOAST (SIN ALERT)
+        // =========================================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast-notification');
+            const msgEl = document.getElementById('toast-message');
+            const iconEl = document.getElementById('toast-icon');
+
+            msgEl.textContent = message;
+            if (type === 'success') {
+                iconEl.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>';
+            } else if (type === 'warning') {
+                iconEl.innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>';
+            } else {
+                iconEl.innerHTML = '<i data-lucide="info" class="w-5 h-5 text-teal-400"></i>';
+            }
+
+            toast.classList.remove('hidden');
+            lucide.createIcons();
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            });
+
+            clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3400);
+        }
+
+        // =========================================================================
+        // NAVEGACIÓN ENTRE PESTAÑAS
+        // =========================================================================
+        function switchTab(tabNumber) {
+            appState.currentTab = tabNumber;
+            for (let i = 1; i <= 4; i++) {
+                const section = document.getElementById(`step-${i}`);
+                const btn = document.getElementById(`tab-btn-${i}`);
+                if (i === tabNumber) {
+                    section.classList.remove('hidden');
+                    if (i === 4) {
+                        btn.className = 'tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-[#f59e0b] text-[#0f172a] border-amber-400 shadow-md';
+                        generateFinalReport();
+                    } else {
+                        btn.className = 'tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-[#0d9488] text-white border-teal-500 shadow-md';
+                    }
+                } else {
+                    section.classList.add('hidden');
+                    if (i === 4) {
+                        btn.className = 'tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-amber-500/10 text-[#f59e0b] border-amber-500/40 hover:bg-amber-500/20';
+                    } else {
+                        btn.className = 'tab-btn flex items-center justify-between px-4 py-3 rounded-xl text-left font-semibold text-sm transition border bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800';
+                    }
+                }
+            }
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =========================================================================
+        // ETAPA 1: DRAG & DROP / CLIC Y VALIDACIÓN DE FICHAS
+        // =========================================================================
+        function renderWordBank() {
+            const bankEl = document.getElementById('word-bank');
+            bankEl.innerHTML = '';
+
+            const available = INITIAL_BANK.filter(item => !appState.slots.includes(item));
+            if (available.length === 0) {
+                bankEl.innerHTML = '<span class="text-xs text-teal-700 font-medium py-1.5">✓ Todas las etiquetas han sido ubicadas en las fichas. Haz clic en una ficha si deseas devolverla.</span>';
+                return;
+            }
+
+            available.forEach(label => {
+                const chip = document.createElement('div');
+                chip.draggable = true;
+                chip.className = 'chip-draggable inline-flex items-center gap-2 bg-[#0f172a] hover:bg-slate-800 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-700';
+                chip.innerHTML = `<i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-[#2dd4bf]"></i> ${label}`;
+
+                chip.addEventListener('dragstart', (e) => {
+                    draggedLabel = label;
+                    e.dataTransfer.setData('text/plain', label);
+                });
+
+                chip.addEventListener('click', () => {
+                    const firstEmptyIdx = appState.slots.indexOf(null);
+                    if (firstEmptyIdx !== -1) {
+                        assignLabelToSlot(firstEmptyIdx, label);
+                    }
+                });
+
+                bankEl.appendChild(chip);
+            });
+            lucide.createIcons();
+        }
+
+        function renderDominoSlots() {
+            const container = document.getElementById('domino-slots-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const assigned = appState.slots[i];
+                const isVerified = appState.step1Verified;
+                const isCorrect = assigned === CORRECT_ORDER[i];
+
+                let borderStyle = 'border-slate-200 bg-white';
+                let statusBadge = '';
+
+                if (isVerified && assigned) {
+                    if (isCorrect) {
+                        borderStyle = 'border-emerald-500 bg-emerald-50/40 ring-2 ring-emerald-500/20';
+                        statusBadge = '<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">✓ Correcto</span>';
+                    } else {
+                        borderStyle = 'border-rose-500 bg-rose-50/40 ring-2 ring-rose-500/20';
+                        statusBadge = `<span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full">✗ Debe ir: ${CORRECT_ORDER[i]}</span>`;
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = `rounded-2xl p-3.5 border-2 ${borderStyle} shadow-sm flex flex-col justify-between transition-all`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-full bg-[#0f172a] text-white text-xs font-extrabold flex items-center justify-center">${i + 1}</span>
+                            ${statusBadge || '<span class="text-[11px] font-semibold text-slate-400">Eslabón ' + (i + 1) + '</span>'}
+                        </div>
+
+                        <!-- Zona Drop -->
+                        <div id="drop-slot-${i}"
+                            class="min-h-[54px] rounded-xl border-2 border-dashed ${assigned ? 'border-[#0d9488] bg-teal-50/70' : 'border-slate-300 bg-slate-50'} flex items-center justify-center p-2 text-center transition cursor-pointer"
+                            title="${assigned ? 'Haz clic para quitar esta etiqueta' : 'Arrastra aquí la etiqueta correspondiente'}">
+                            ${assigned
+                                ? `<span class="font-extrabold text-sm text-[#0f172a] flex items-center gap-1.5">${assigned} <i data-lucide="x-circle" class="w-3.5 h-3.5 text-slate-400 hover:text-rose-600"></i></span>`
+                                : `<span class="text-xs text-slate-400 font-medium">Soltar ficha #${i + 1}</span>`
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Definición Operativa Editable -->
+                    <div class="mt-3 pt-2.5 border-t border-slate-100">
+                        <label for="def-input-${i}" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Definición operativa:
+                        </label>
+                        <textarea id="def-input-${i}" rows="3" oninput="saveState()"
+                            placeholder="¿Qué ocurre en este paso?"
+                            class="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-700 focus:outline-none focus:border-[#0d9488] bg-white resize-none">${appState.definitions[i] || ''}</textarea>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                const dropZone = document.getElementById(`drop-slot-${i}`);
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drop-zone-active');
+                });
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('drop-zone-active');
+                });
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drop-zone-active');
+                    const label = e.dataTransfer.getData('text/plain') || draggedLabel;
+                    if (label) assignLabelToSlot(i, label);
+                });
+                dropZone.addEventListener('click', () => {
+                    if (appState.slots[i]) {
+                        appState.slots[i] = null;
+                        appState.step1Verified = false;
+                        renderWordBank();
+                        renderDominoSlots();
+                        saveState();
+                    }
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function assignLabelToSlot(slotIndex, label) {
+            const existingIndex = appState.slots.indexOf(label);
+            if (existingIndex !== -1) {
+                appState.slots[existingIndex] = null;
+            }
+            appState.slots[slotIndex] = label;
+            appState.step1Verified = false;
+            renderWordBank();
+            renderDominoSlots();
+            saveState();
+        }
+
+        function resetStep1() {
+            appState.slots = [null, null, null, null, null];
+            appState.step1Verified = false;
+            document.getElementById('official-definitions-panel').classList.add('hidden');
+            document.getElementById('step1-feedback-banner').innerHTML = 'Completa las 5 fichas y sus definiciones operativas para validar tu secuencia.';
+            renderWordBank();
+            renderDominoSlots();
+            saveState();
+            showToast('Se han reiniciado las fichas de la Etapa 1.', 'info');
+        }
+
+        function verifyStep1() {
+            if (appState.slots.includes(null)) {
+                showToast('Asigna las 5 etiquetas a las fichas antes de verificar la secuencia.', 'warning');
+                return;
+            }
+
+            appState.step1Verified = true;
+            renderDominoSlots();
+            document.getElementById('official-definitions-panel').classList.remove('hidden');
+
+            const isAllCorrect = appState.slots.every((val, idx) => val === CORRECT_ORDER[idx]);
+            const banner = document.getElementById('step1-feedback-banner');
+
+            if (isAllCorrect) {
+                banner.innerHTML = '<span class="text-emerald-700 font-bold">✓ ¡Secuencia perfecta! Has reconstruido el efecto dominó de Brent Dykes. Revisa abajo las definiciones oficiales para autoevaluar tus textos.</span>';
+                showToast('¡Excelente! La secuencia de 5 pasos es 100% correcta.', 'success');
+            } else {
+                banner.innerHTML = '<span class="text-rose-700 font-bold">⚠ Revisa los eslabones marcados en rojo. Recuerda que si un paso está fuera de orden, el flujo hacia el Valor se detiene.</span>';
+                showToast('Hay eslabones fuera de orden. Revisa las indicaciones en rojo.', 'warning');
+            }
+            saveState();
+        }
+
+        // =========================================================================
+        // ETAPA 2: SIMULADOR ANIMADO DE «FICHAS CAÍDAS»
+        // =========================================================================
+        function selectBottleneck(optionId) {
+            appState.selectedBottleneck = optionId;
+            highlightBottleneckCard(optionId);
+            resetSimulation();
+            document.getElementById('sim-status-text').textContent = `Escenario seleccionado: ${BOTTLENECK_LABELS[optionId]}`;
+            saveState();
+        }
+
+        function highlightBottleneckCard(optionId) {
+            for (let i = 1; i <= 4; i++) {
+                const card = document.getElementById(`bn-card-${i}`);
+                if (i === optionId) {
+                    card.classList.remove('border-slate-200', 'bg-slate-50/60');
+                    card.classList.add('border-[#0d9488]', 'bg-teal-50/60', 'ring-2', 'ring-teal-500/20');
+                } else {
+                    card.classList.add('border-slate-200', 'bg-slate-50/60');
+                    card.classList.remove('border-[#0d9488]', 'bg-teal-50/60', 'ring-2', 'ring-teal-500/20');
+                }
+            }
+        }
+
+        function resetSimulation() {
+            simulationTimers.forEach(t => clearTimeout(t));
+            simulationTimers = [];
+
+            for (let i = 1; i <= 6; i++) {
+                const domino = document.getElementById(`sim-domino-${i}`);
+                const tag = document.getElementById(`sim-tag-${i}`);
+                domino.classList.remove('domino-fallen', 'domino-blocked', 'border-emerald-400', 'bg-emerald-950/50');
+                if (i < 6) {
+                    domino.classList.add('border-slate-600');
+                    tag.textContent = 'Listo';
+                    tag.className = 'text-[11px] text-center text-slate-400';
+                } else {
+                    tag.textContent = 'En espera';
+                    tag.className = 'text-[11px] text-center text-teal-300';
+                }
+            }
+            const alertBox = document.getElementById('sim-alert-box');
+            alertBox.classList.add('hidden');
+        }
+
+        function runDominoSimulation() {
+            if (!appState.selectedBottleneck) {
+                showToast('Selecciona primero uno de los 4 escenarios de ruptura arriba.', 'warning');
+                return;
+            }
+
+            resetSimulation();
+            const choice = appState.selectedBottleneck;
+
+            // Determinar hasta qué ficha cae antes de bloquearse
+            // Choice 1: cae 1 (Datos) y 2 (Información), se bloquea en 3 (Insights)
+            // Choice 2: cae 1, 2 y 3 (Insights), se bloquea en 4 (Decisiones)
+            // Choice 3: cae 1, 2, 3 y 4 (Decisiones), se bloquea en 5 (Acción)
+            // Choice 4: caen 1, 2, 3, 4, 5 y derriban 6 (Valor)
+            const stopAt = choice === 1 ? 3 : choice === 2 ? 4 : choice === 3 ? 5 : 7;
+
+            for (let step = 1; step <= 6; step++) {
+                const timer = setTimeout(() => {
+                    const domino = document.getElementById(`sim-domino-${step}`);
+                    const tag = document.getElementById(`sim-tag-${step}`);
+
+                    if (step < stopAt) {
+                        domino.classList.add('domino-fallen', 'border-emerald-400');
+                        domino.classList.remove('border-slate-600');
+                        tag.textContent = step === 6 ? '★ ¡VALOR ALCANZADO!' : '✓ Impulsada';
+                        tag.className = 'text-[11px] text-center font-bold text-emerald-300';
+                    } else if (step === stopAt) {
+                        domino.classList.add('domino-blocked');
+                        tag.textContent = '⚠ ¡CUELLO DE BOTELLA!';
+                        tag.className = 'text-[11px] text-center font-extrabold text-[#f59e0b]';
+                    } else {
+                        tag.textContent = 'Sin impacto (Vacío)';
+                        tag.className = 'text-[11px] text-center text-rose-400';
+                    }
+
+                    if (step === 6) {
+                        showSimulationSummary(choice);
+                    }
+                }, step * 420);
+
+                simulationTimers.push(timer);
+            }
+        }
+
+        function showSimulationSummary(choice) {
+            const alertBox = document.getElementById('sim-alert-box');
+            const alertContent = document.getElementById('sim-alert-content');
+            alertBox.classList.remove('hidden', 'bg-amber-950/70', 'border-amber-500/50', 'text-amber-100', 'bg-emerald-950/70', 'border-emerald-500/50', 'text-emerald-100');
+
+            if (choice === 4) {
+                alertBox.classList.add('bg-emerald-950/70', 'border-emerald-500/50', 'text-emerald-100');
+                alertContent.innerHTML = '<strong>¡Cadena de Valor Completa!</strong> Cuando los datos se transforman en insights accionables y se comunican con narrativa y visualización efectivas, la organización toma decisiones y ejecuta acciones que generan retorno tangible.';
+            } else {
+                alertBox.classList.add('bg-amber-950/70', 'border-amber-500/50', 'text-amber-100');
+                const messages = {
+                    1: '<strong>Ruptura en Información → Insights:</strong> La organización está inundada de dashboards descriptivos, pero carece de exploración profunda. Como dice Stephen Few, sin acción los datos quedan como números vacíos.',
+                    2: '<strong>Ruptura en Insights → Decisiones:</strong> El analista encontró un patrón valioso, pero la falta de Data Storytelling impidió vencer la resistencia cultural o política de quienes deciden.',
+                    3: '<strong>Ruptura en Decisiones → Acción:</strong> Hubo consenso en sala, pero faltó seguimiento y compromiso operativo. Sin implementación real en el negocio, el insight no genera retorno.'
+                };
+                alertContent.innerHTML = messages[choice];
+            }
+            lucide.createIcons();
+        }
+
+        // =========================================================================
+        // ETAPA 3: LIENZO DE CASO PRÁCTICO
+        // =========================================================================
+        function loadModelCase() {
+            appState.caseTitle = MODEL_CASE.title;
+            appState.caseSteps = [...MODEL_CASE.steps];
+            restoreInputs();
+            saveState();
+            showToast('Se cargó el Caso Modelo de Ventas Minoristas (CertiProf DSTPC).', 'success');
+        }
+
+        function clearCaseCanvas() {
+            appState.caseTitle = '';
+            appState.caseSteps = ['', '', '', '', '', ''];
+            restoreInputs();
+            saveState();
+            showToast('Lienzo limpio. Listo para documentar tu propio caso práctico.', 'info');
+        }
+
+        // =========================================================================
+        // PROGRESO Y GENERACIÓN DE EVIDENCIA FINAL
+        // =========================================================================
+        function updateProgress() {
+            let score = 0;
+            // 1. Nombre (10%)
+            if (appState.studentName.trim().length > 2) score += 10;
+            // 2. Etapa 1: fichas asignadas + al menos 3 definiciones (30%)
+            const filledSlots = appState.slots.filter(s => s !== null).length;
+            const filledDefs = appState.definitions.filter(d => d.trim().length > 3).length;
+            score += Math.round((filledSlots / 5) * 15) + Math.round((filledDefs / 5) * 15);
+            // 3. Etapa 2: diagnóstico seleccionado + reflexiones (30%)
+            if (appState.selectedBottleneck) score += 10;
+            if (appState.barriers.trim().length > 5) score += 10;
+            if (appState.solution.trim().length > 5) score += 10;
+            // 4. Etapa 3: caso práctico completado (30%)
+            const filledCase = appState.caseSteps.filter(c => c.trim().length > 3).length;
+            score += Math.round((filledCase / 6) * 30);
+
+            document.getElementById('progress-bar').style.width = `${score}%`;
+            document.getElementById('progress-text').textContent = `${score}% Completado`;
+
+            // Actualizar badges de pestañas
+            updateStepBadge('badge-step-1', filledSlots === 5 && filledDefs >= 3);
+            updateStepBadge('badge-step-2', appState.selectedBottleneck && appState.barriers.trim().length > 3);
+            updateStepBadge('badge-step-3', filledCase >= 4);
+        }
+
+        function updateStepBadge(id, isDone) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (isDone) {
+                el.textContent = 'Listo ✓';
+                el.className = 'text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold';
+            } else {
+                el.textContent = 'Pendiente';
+                el.className = 'text-xs px-2 py-0.5 rounded-full bg-black/20 text-slate-300';
+            }
+        }
+
+        function generateFinalReport() {
+            saveState();
+            document.getElementById('report-student-name').textContent = appState.studentName.trim() || 'Estudiante / Equipo (Sin nombre registrado)';
+            const now = new Date();
+            document.getElementById('report-date').textContent = `Fecha de generación: ${now.toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+            // Renderizar Etapa 1
+            const step1Grid = document.getElementById('report-step1-grid');
+            step1Grid.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const label = appState.slots[i] || '(Sin asignar)';
+                const def = appState.definitions[i].trim() || 'Sin definición registrada.';
+                step1Grid.innerHTML += `
+                    <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70">
+                        <div class="text-xs font-extrabold text-[#0d9488]">${i + 1}. ${label.toUpperCase()}</div>
+                        <p class="text-xs text-slate-700 mt-1.5 leading-relaxed">${escapeHtml(def)}</p>
+                    </div>
+                `;
+            }
+
+            // Renderizar Etapa 2
+            document.getElementById('report-bottleneck-title').textContent = appState.selectedBottleneck
+                ? BOTTLENECK_LABELS[appState.selectedBottleneck]
+                : 'No se seleccionó un escenario de ruptura.';
+            document.getElementById('report-barriers').textContent = appState.barriers.trim() || 'Sin observaciones registradas.';
+            document.getElementById('report-solution').textContent = appState.solution.trim() || 'Sin propuesta registrada.';
+
+            // Renderizar Etapa 3
+            document.getElementById('report-case-title').textContent = appState.caseTitle.trim() || 'Caso Práctico Personalizado';
+            const caseLabels = ['1. Dato', '2. Información', '3. Insight', '4. Decisión', '5. Acción', '6. Valor Generado'];
+            const caseGrid = document.getElementById('report-case-grid');
+            caseGrid.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const val = appState.caseSteps[i].trim() || 'Sin completar.';
+                const highlight = i === 5 ? 'border-[#0d9488] bg-teal-50/50' : 'border-slate-200 bg-white';
+                caseGrid.innerHTML += `
+                    <div class="p-3.5 rounded-xl border ${highlight}">
+                        <div class="text-xs font-extrabold text-[#0f172a]">${caseLabels[i]}</div>
+                        <p class="text-xs text-slate-700 mt-1.5 leading-relaxed">${escapeHtml(val)}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function copySummaryToClipboard() {
+            generateFinalReport();
+            const student = appState.studentName.trim() || 'Sin especificar';
+            const bnText = appState.selectedBottleneck ? BOTTLENECK_LABELS[appState.selectedBottleneck] : 'No seleccionado';
+            const caseLabels = ['1. Dato', '2. Información', '3. Insight', '4. Decisión', '5. Acción', '6. Valor Generado'];
+
+            let text = `EVIDENCIA: CADENA DE VALOR DE 5 PASOS CON ANALÍTICA DE DATOS (BRENT DYKES)\n`;
+            text += `Estudiante / Equipo: ${student}\n`;
+            text += `====================================================================\n\n`;
+            text += `ETAPA 1: ORDENAMIENTO Y DEFINICIÓN OPERATIVA\n`;
+            for (let i = 0; i < 5; i++) {
+                text += `${i + 1}. ${appState.slots[i] || '[Sin asignar]'}: ${appState.definitions[i].trim() || 'Sin definición'}\n`;
+            }
+            text += `\nETAPA 2: DIAGNÓSTICO DE FICHAS CAÍDAS\n`;
+            text += `- Cuello de botella identificado: ${bnText}\n`;
+            text += `- Factores organizacionales: ${appState.barriers.trim() || 'N/A'}\n`;
+            text += `- Solución con Data Storytelling: ${appState.solution.trim() || 'N/A'}\n`;
+            text += `\nETAPA 3: MAPEO DE CASO PRÁCTICO (${appState.caseTitle.trim() || 'Caso Aplicado'})\n`;
+            for (let i = 0; i < 6; i++) {
+                text += `- ${caseLabels[i]}: ${appState.caseSteps[i].trim() || 'N/A'}\n`;
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('¡Resumen copiado al portapapeles! Ya puedes pegarlo en Moodle.', 'success');
+            } catch (err) {
+                showToast('No se pudo copiar automáticamente. Usa el botón Imprimir / PDF.', 'warning');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
