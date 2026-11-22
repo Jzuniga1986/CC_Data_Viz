@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Los Tres Elementos Esenciales de las Historias con Datos (CertiProf DSTPC)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+
+    /* Transiciones suaves de paneles */
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilos de impresión limpios para exportar PDF */
+    @media print {
+      header, nav, .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: #ffffff !important;
+      }
+      .tab-panel {
+        display: none !important;
+      }
+      #panel-3 {
+        display: block !important;
+      }
+      #receipt-card {
+        border: 2px solid #0f2942 !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ENCABEZADO INSTITUCIONAL -->
+  <header class="bg-[#0f2942] text-white border-b-4 border-[#0284c7] py-6 px-4 sm:px-6 shadow-md">
+    <div class="max-w-5xl mx-auto">
+      <span class="inline-block bg-white/15 border border-white/25 text-sky-200 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2">
+        Semana 1 · Bloque 3 · Guía de Estudio CertiProf DSTPC (Brent Dykes, Cap. 2, págs. 51–69)
+      </span>
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+        Los Tres Elementos Esenciales de las Historias con Datos
+      </h1>
+      <p class="text-slate-300 text-sm sm:text-base mt-1">
+        Aprende paso a paso cómo unir <strong>Datos, Narrativa y Visualización</strong> para que tus análisis impulsen decisiones reales.
+      </p>
+    </div>
+  </header>
+
+  <!-- NAVEGACIÓN SUPERIOR DE 3 PESTAÑAS -->
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm" aria-label="Pasos del taller">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3">
+      <button type="button" id="tab-btn-1" onclick="switchTab(1)"
+        class="tab-btn flex items-center justify-center gap-2.5 py-3.5 px-4 text-sm font-bold border-b-4 border-[#0284c7] bg-sky-50/70 text-[#0284c7] transition-all cursor-pointer">
+        <span class="w-6 h-6 rounded-full bg-[#0284c7] text-white text-xs font-extrabold flex items-center justify-center">1</span>
+        <span>1 · Aprende la teoría</span>
+      </button>
+
+      <button type="button" id="tab-btn-2" onclick="switchTab(2)"
+        class="tab-btn flex items-center justify-center gap-2.5 py-3.5 px-4 text-sm font-bold border-b-4 border-transparent text-slate-600 hover:text-[#0f2942] hover:bg-slate-50 transition-all cursor-pointer">
+        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center justify-center">2</span>
+        <span>2 · Arma el diagrama</span>
+      </button>
+
+      <button type="button" id="tab-btn-3" onclick="switchTab(3)"
+        class="tab-btn flex items-center justify-center gap-2.5 py-3.5 px-4 text-sm font-bold border-b-4 border-transparent text-slate-600 hover:text-[#0f2942] hover:bg-slate-50 transition-all cursor-pointer">
+        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center justify-center">3</span>
+        <span>3 · Mejora un reporte</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1">
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 1: 1 · APRENDE LA TEORÍA                                      -->
+    <!-- ===================================================================== -->
+    <section id="panel-1" class="tab-panel active space-y-6">
+
+      <!-- Banner inicial amigable -->
+      <div class="bg-sky-50 border border-sky-200 border-l-4 border-l-[#0284c7] rounded-xl p-5 shadow-sm">
+        <h2 class="text-base sm:text-lg font-bold text-[#0f2942] flex items-center gap-2">
+          <span>💡 ¿Por qué estamos haciendo este ejercicio?</span>
+        </h2>
+        <p class="text-sm sm:text-base text-slate-700 mt-1.5 leading-relaxed">
+          En el trabajo diario, muchos analistas envían hojas de Excel llenas de números o tableros con muchos gráficos, pero los jefes no toman ninguna decisión. ¿Por qué? Porque <strong>las personas solo recuerdan el 5 % de los datos sueltos, pero recuerdan el 63 % cuando se cuentan como una historia visual</strong> (Brent Dykes, Guía DSTPC, Cap. 2).
+        </p>
+      </div>
+
+      <!-- Sección 1: Conoce los 3 pilares -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-sm">
+        <h2 class="text-lg sm:text-xl font-extrabold text-[#0f2942] mb-1">
+          1. Conoce los 3 pilares (y qué pasa cuando los mezclas)
+        </h2>
+        <p class="text-sm text-slate-600 mb-6">
+          Observa cómo se combinan los tres elementos esenciales para transformar datos crudos en acción:
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          <!-- Columna Izquierda: Diagrama SVG Visual Completo -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col items-center">
+            <svg viewBox="0 0 480 430" class="w-full max-w-[420px] h-auto" role="img" aria-label="Diagrama de Venn oficial de los tres pilares de Brent Dykes">
+              <!-- Círculo Narrativa (Arriba Izquierda - Naranja #f59e0b) -->
+              <circle cx="172" cy="158" r="118" fill="#f59e0b" fill-opacity="0.90" stroke="#ffffff" stroke-width="4" />
+              <!-- Círculo Visualización (Arriba Derecha - Azul #0284c7) -->
+              <circle cx="308" cy="158" r="118" fill="#0284c7" fill-opacity="0.90" stroke="#ffffff" stroke-width="4" />
+              <!-- Círculo Datos (Abajo Centro - Verde #16a34a) -->
+              <circle cx="240" cy="268" r="118" fill="#16a34a" fill-opacity="0.90" stroke="#ffffff" stroke-width="4" />
+
+              <!-- Intersecciones oscuras -->
+              <!-- Comprometer (Arriba entre Narrativa y Visualización) -->
+              <ellipse cx="240" cy="128" rx="30" ry="50" fill="#0f2942" />
+              <!-- Explicar (Izquierda entre Narrativa y Datos) -->
+              <ellipse cx="182" cy="224" rx="48" ry="27" transform="rotate(32 182 224)" fill="#0f2942" />
+              <!-- Iluminar (Derecha entre Visualización y Datos) -->
+              <ellipse cx="298" cy="224" rx="48" ry="27" transform="rotate(-32 298 224)" fill="#0f2942" />
+
+              <!-- Círculo Blanco Central -->
+              <circle cx="240" cy="195" r="41" fill="#ffffff" stroke="#0f2942" stroke-width="3.5" />
+
+              <!-- Ícono Micrófono (Narrativa) -->
+              <g transform="translate(115, 92)" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="2" width="8" height="14" rx="4" fill="#ffffff" fill-opacity="0.25" />
+                <path d="M4 11a8 8 0 0 0 16 0" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+              </g>
+              <text x="127" y="136" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="16">Narrativa</text>
+              <text x="127" y="153" text-anchor="middle" fill="#fef3c7" font-size="11.5" font-weight="600">(Palabras e historia)</text>
+
+              <!-- Ícono Gráfico (Visualización) -->
+              <g transform="translate(340, 92)" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" fill="#ffffff" fill-opacity="0.2" />
+                <line x1="7" y1="13" x2="7" y2="10" />
+                <line x1="12" y1="13" x2="12" y2="7" />
+                <line x1="17" y1="13" x2="17" y2="9" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </g>
+              <text x="352" y="136" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="16">Visualización</text>
+              <text x="352" y="153" text-anchor="middle" fill="#e0f2fe" font-size="11.5" font-weight="600">(Gráficos claros)</text>
+
+              <!-- Ícono Base de Datos (Datos) -->
+              <g transform="translate(228, 290)" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3.5" fill="#ffffff" fill-opacity="0.25" />
+                <path d="M3 5v6c0 1.9 4 3.5 9 3.5s9-1.6 9-3.5V5" />
+                <path d="M3 11v6c0 1.9 4 3.5 9 3.5s9-1.6 9-3.5v-6" />
+              </g>
+              <text x="240" y="332" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="16">Datos</text>
+              <text x="240" y="349" text-anchor="middle" fill="#dcfce7" font-size="11.5" font-weight="600">(Evidencia real)</text>
+
+              <!-- Etiquetas de Intersecciones Oscuras -->
+              <text x="240" y="123" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="10.5">Comprometer</text>
+              <text x="179" y="228" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11.5">Explicar</text>
+              <text x="301" y="228" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11.5">Iluminar</text>
+
+              <!-- Etiqueta Central -->
+              <text x="240" y="191" text-anchor="middle" fill="#0f2942" font-weight="800" font-size="10.5">HISTORIA</text>
+              <text x="240" y="205" text-anchor="middle" fill="#0284c7" font-weight="800" font-size="10.5">DE DATOS</text>
+            </svg>
+            <p class="text-xs text-slate-500 text-center mt-2">
+              Adaptado de Brent Dykes (2019) · Guía Oficial CertiProf DSTPC, pág. 59
+            </p>
+          </div>
+
+          <!-- Columna Derecha: Tres tarjetas explicativas sencillas -->
+          <div class="space-y-3.5">
+            <div class="bg-green-50/80 border border-green-200 border-l-4 border-l-[#16a34a] rounded-xl p-4">
+              <h3 class="font-bold text-[#0f2942] text-base flex items-center gap-2">
+                <span>🗄️ 1. Datos (La base de todo)</span>
+              </h3>
+              <p class="text-sm text-slate-700 mt-1">
+                Son los números y hechos reales verificados. Sin datos limpios y confiables, cualquier presentación es solo una opinión sin pruebas.
+              </p>
+            </div>
+
+            <div class="bg-amber-50/80 border border-amber-200 border-l-4 border-l-[#f59e0b] rounded-xl p-4">
+              <h3 class="font-bold text-[#0f2942] text-base flex items-center gap-2">
+                <span>🎙️ 2. Narrativa (El hilo conductor)</span>
+              </h3>
+              <p class="text-sm text-slate-700 mt-1">
+                Son las palabras que explican <em>qué pasó, por qué es importante y qué debemos hacer</em>. Guía a las personas paso a paso para que entiendan el mensaje.
+              </p>
+            </div>
+
+            <div class="bg-sky-50/80 border border-sky-200 border-l-4 border-l-[#0284c7] rounded-xl p-4">
+              <h3 class="font-bold text-[#0f2942] text-base flex items-center gap-2">
+                <span>📊 3. Visualización (Lo que entra por los ojos)</span>
+              </h3>
+              <p class="text-sm text-slate-700 mt-1">
+                Son los gráficos que permiten ver en segundos tendencias o problemas ocultos que nadie notaría leyendo una tabla llena de filas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subsección: ¿Qué pasa si solo usas DOS elementos? -->
+        <div class="mt-8 pt-6 border-t border-slate-200">
+          <h3 class="text-base sm:text-lg font-extrabold text-[#0f2942] mb-3">
+            ¿Qué pasa si solo usas DOS elementos y olvidas el tercero?
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <span class="inline-block text-xs font-bold uppercase px-2.5 py-0.5 rounded bg-slate-200 text-slate-800 mb-2">
+                Datos + Narrativa
+              </span>
+              <h4 class="font-bold text-[#0f2942] text-sm sm:text-base">= EXPLICAR</h4>
+              <p class="text-xs sm:text-sm text-slate-600 mt-1.5">
+                <strong>Ejemplo:</strong> Un informe largo en Word con mucho texto y números, pero <strong>sin gráficos</strong>. Explica bien el contexto, pero cansa la vista y cuesta ver las tendencias.
+              </p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <span class="inline-block text-xs font-bold uppercase px-2.5 py-0.5 rounded bg-slate-200 text-slate-800 mb-2">
+                Datos + Visualización
+              </span>
+              <h4 class="font-bold text-[#0f2942] text-sm sm:text-base">= ILUMINAR</h4>
+              <p class="text-xs sm:text-sm text-slate-600 mt-1.5">
+                <strong>Ejemplo:</strong> Un dashboard con gráficos claros que muestran caídas o picos, pero <strong>sin narrativa que guíe</strong>. Cada jefe saca una conclusión distinta y nadie actúa.
+              </p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <span class="inline-block text-xs font-bold uppercase px-2.5 py-0.5 rounded bg-slate-200 text-slate-800 mb-2">
+                Narrativa + Visualización
+              </span>
+              <h4 class="font-bold text-[#0f2942] text-sm sm:text-base">= COMPROMETER</h4>
+              <p class="text-xs sm:text-sm text-slate-600 mt-1.5">
+                <strong>Ejemplo:</strong> Una presentación muy bonita con buenas palabras e imágenes que atrapa la atención, pero <strong>sin datos reales</strong> que respalden lo que se dice.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 2: ¿Qué tienes que hacer en esta actividad? -->
+      <div class="bg-white border border-slate-200 border-l-4 border-l-[#16a34a] rounded-2xl p-5 sm:p-7 shadow-sm">
+        <h2 class="text-lg sm:text-xl font-extrabold text-[#0f2942] mb-1">
+          2. ¿Qué tienes que hacer en esta actividad? (En 3 pasos simples)
+        </h2>
+        <p class="text-sm text-slate-600 mb-4">
+          Avanza usando las pestañas de arriba en orden. Todo se realiza aquí mismo sin instalar programas:
+        </p>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-[#0f2942] text-white">
+                <th class="py-3 px-4 font-bold">¿En qué pestaña?</th>
+                <th class="py-3 px-4 font-bold">¿Qué vas a hacer exactamente?</th>
+                <th class="py-3 px-4 font-bold">¿Para qué te sirve?</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr class="bg-white">
+                <td class="py-3.5 px-4 font-bold text-[#0284c7] whitespace-nowrap">Paso 2: Arma el diagrama</td>
+                <td class="py-3.5 px-4 text-slate-700">Completarás el diagrama en blanco eligiendo dónde va cada cruce (<em>Explicar, Iluminar, Comprometer</em>) y el resultado central.</td>
+                <td class="py-3.5 px-4 text-slate-600">Comprobar que dominas cómo se conectan los 3 círculos antes de pasar al caso práctico.</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="py-3.5 px-4 font-bold text-[#16a34a] whitespace-nowrap">Paso 3: Mejora un reporte</td>
+                <td class="py-3.5 px-4 text-slate-700">Elegirás un caso real (un dashboard o un PDF) y escribirás qué dato, qué historia y qué gráfico agregarías para llevarlo al centro.</td>
+                <td class="py-3.5 px-4 text-slate-600">Generar tu <strong>Ficha de Respuesta</strong> lista para copiar y pegar en Moodle o guardar en PDF.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6">
+          <button type="button" onclick="switchTab(2)"
+            class="bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-sm sm:text-base py-3 px-6 rounded-xl shadow-sm transition-all cursor-pointer inline-flex items-center gap-2">
+            <span>Entendido, ir al Paso 2: Arma el diagrama →</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 2: 2 · ARMA EL DIAGRAMA                                       -->
+    <!-- ===================================================================== -->
+    <section id="panel-2" class="tab-panel space-y-6">
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-[#0f2942]">
+              Paso 2: Arma el diagrama de los tres pilares
+            </h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Elige la opción correcta en cada menú de la derecha. Verás cómo el diagrama de la izquierda se va completando en tiempo real.
+            </p>
+          </div>
+          <button type="button" onclick="resetDiagram()"
+            class="text-xs font-bold text-slate-600 hover:text-[#0f2942] bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors cursor-pointer">
+            ↺ Reiniciar ejercicio
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <!-- Izquierda: Diagrama SVG Interactivo -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col items-center lg:sticky lg:top-20">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">
+              TU DIAGRAMA EN CONSTRUCCIÓN
+            </span>
+
+            <svg viewBox="0 0 480 430" class="w-full max-w-[420px] h-auto" role="img" aria-label="Diagrama interactivo en construcción">
+              <!-- Círculo Narrativa (Naranja) -->
+              <circle cx="172" cy="158" r="118" fill="#f59e0b" fill-opacity="0.88" stroke="#ffffff" stroke-width="4" />
+              <!-- Círculo Visualización (Azul) -->
+              <circle cx="308" cy="158" r="118" fill="#0284c7" fill-opacity="0.88" stroke="#ffffff" stroke-width="4" />
+              <!-- Círculo Datos (Verde) -->
+              <circle cx="240" cy="268" r="118" fill="#16a34a" fill-opacity="0.88" stroke="#ffffff" stroke-width="4" />
+
+              <!-- Intersecciones oscuras -->
+              <ellipse cx="240" cy="128" rx="32" ry="50" fill="#0f2942" />
+              <ellipse cx="182" cy="224" rx="48" ry="27" transform="rotate(32 182 224)" fill="#0f2942" />
+              <ellipse cx="298" cy="224" rx="48" ry="27" transform="rotate(-32 298 224)" fill="#0f2942" />
+
+              <!-- Centro Blanco -->
+              <circle cx="240" cy="195" r="43" fill="#ffffff" stroke="#0f2942" stroke-width="3.5" />
+
+              <!-- Pilares externos rotulados -->
+              <text x="125" y="138" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="16">🎙️ Narrativa</text>
+              <text x="355" y="138" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="16">📊 Visualización</text>
+              <text x="240" y="340" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="17">🗄️ Datos</text>
+
+              <!-- Textos dinámicos en intersecciones y centro -->
+              <text id="svg-cruce-1" x="240" y="123" text-anchor="middle" fill="#38bdf8" font-weight="800" font-size="11">¿Cruce 1?</text>
+              <text id="svg-cruce-2" x="179" y="228" text-anchor="middle" fill="#38bdf8" font-weight="800" font-size="11.5">¿Cruce 2?</text>
+              <text id="svg-cruce-3" x="301" y="228" text-anchor="middle" fill="#38bdf8" font-weight="800" font-size="11.5">¿Cruce 3?</text>
+
+              <text id="svg-centro-l1" x="240" y="192" text-anchor="middle" fill="#0f2942" font-weight="800" font-size="10.5">¿Centro?</text>
+              <text id="svg-centro-l2" x="240" y="206" text-anchor="middle" fill="#0284c7" font-weight="700" font-size="9.5"></text>
+            </svg>
+          </div>
+
+          <!-- Derecha: 4 preguntas con menús desplegables -->
+          <div class="space-y-4">
+            <!-- Pregunta 1: Datos + Narrativa -->
+            <div id="q-box-left" class="bg-slate-50 border border-slate-200 rounded-xl p-4 transition-colors">
+              <label for="sel-left" class="block font-bold text-sm text-[#0f2942] mb-1">
+                1. Cuando juntas 🗄️ Datos + 🎙️ Narrativa (Cruce izquierdo):
+              </label>
+              <p class="text-xs text-slate-600 mb-2.5">
+                Pista: Sirve para dar contexto y contar por qué importa un número (como en un informe escrito).
+              </p>
+              <select id="sel-left" onchange="updateLiveDiagram()"
+                class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-[#0284c7]">
+                <option value="">-- Elige una opción --</option>
+                <option value="Explicar">Explicar</option>
+                <option value="Iluminar">Iluminar</option>
+                <option value="Comprometer">Comprometer</option>
+              </select>
+            </div>
+
+            <!-- Pregunta 2: Datos + Visualización -->
+            <div id="q-box-right" class="bg-slate-50 border border-slate-200 rounded-xl p-4 transition-colors">
+              <label for="sel-right" class="block font-bold text-sm text-[#0f2942] mb-1">
+                2. Cuando juntas 🗄️ Datos + 📊 Visualización (Cruce derecho):
+              </label>
+              <p class="text-xs text-slate-600 mb-2.5">
+                Pista: Sirve para hacer visibles patrones ocultos o anomalías mediante gráficos.
+              </p>
+              <select id="sel-right" onchange="updateLiveDiagram()"
+                class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-[#0284c7]">
+                <option value="">-- Elige una opción --</option>
+                <option value="Explicar">Explicar</option>
+                <option value="Iluminar">Iluminar</option>
+                <option value="Comprometer">Comprometer</option>
+              </select>
+            </div>
+
+            <!-- Pregunta 3: Narrativa + Visualización -->
+            <div id="q-box-top" class="bg-slate-50 border border-slate-200 rounded-xl p-4 transition-colors">
+              <label for="sel-top" class="block font-bold text-sm text-[#0f2942] mb-1">
+                3. Cuando juntas 🎙️ Narrativa + 📊 Visualización (Cruce superior):
+              </label>
+              <p class="text-xs text-slate-600 mb-2.5">
+                Pista: Sirve para atrapar la atención y emocionar a la audiencia con historias e imágenes.
+              </p>
+              <select id="sel-top" onchange="updateLiveDiagram()"
+                class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-[#0284c7]">
+                <option value="">-- Elige una opción --</option>
+                <option value="Explicar">Explicar</option>
+                <option value="Iluminar">Iluminar</option>
+                <option value="Comprometer">Comprometer</option>
+              </select>
+            </div>
+
+            <!-- Pregunta 4: Centro -->
+            <div id="q-box-center" class="bg-slate-50 border border-slate-200 rounded-xl p-4 transition-colors">
+              <label for="sel-center" class="block font-bold text-sm text-[#0f2942] mb-1">
+                4. ¿Qué ocurre en el centro cuando logras unir los TRES pilares?
+              </label>
+              <p class="text-xs text-slate-600 mb-2.5">
+                Pista: Es el punto de equilibrio donde se educa, se demuestra y se motiva a actuar.
+              </p>
+              <select id="sel-center" onchange="updateLiveDiagram()"
+                class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-[#0284c7]">
+                <option value="">-- Elige una opción --</option>
+                <option value="Data Storytelling">Data Storytelling (Impulsa decisiones y cambio)</option>
+                <option value="Solo un gráfico bonito">Solo un gráfico bonito</option>
+                <option value="Una tabla de Excel">Una tabla de Excel</option>
+              </select>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-wrap gap-3 pt-2">
+              <button type="button" onclick="checkDiagramAnswers()"
+                class="bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-sm py-3 px-5 rounded-xl shadow-sm transition-all cursor-pointer">
+                ✓ Comprobar mis respuestas
+              </button>
+              <button type="button" onclick="switchTab(3)"
+                class="bg-[#16a34a] hover:bg-green-700 text-white font-bold text-sm py-3 px-5 rounded-xl shadow-sm transition-all cursor-pointer">
+                Ir al Paso 3: Mejora un reporte →
+              </button>
+            </div>
+
+            <!-- Caja de retroalimentación -->
+            <div id="feedback-step-2" class="hidden rounded-xl p-4 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 3: 3 · MEJORA UN REPORTE                                      -->
+    <!-- ===================================================================== -->
+    <section id="panel-3" class="tab-panel space-y-6">
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-sm no-print">
+        <h2 class="text-lg sm:text-xl font-extrabold text-[#0f2942] mb-1">
+          Paso 3: Lleva un reporte incompleto hacia el centro
+        </h2>
+        <p class="text-sm text-slate-600 mb-5">
+          <strong>Instrucción:</strong> Haz clic sobre uno de los <strong>3 escenarios</strong> de abajo y luego completa los campos para transformar ese reporte en una Historia de Datos completa.
+        </p>
+
+        <!-- Selector visual de 3 tarjetas clicables -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <button type="button" id="case-card-A" onclick="selectScenario('A')"
+            class="case-card text-left p-4 rounded-xl border-2 border-[#0284c7] bg-sky-50/80 transition-all cursor-pointer">
+            <div class="font-extrabold text-sm text-[#0f2942] mb-1">📊 Caso A: Dashboard sin historia</div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Un tablero en Power BI con 10 gráficos de ventas, pero nadie sabe qué decisión tomar. <strong>Le falta Narrativa.</strong>
+            </p>
+          </button>
+
+          <button type="button" id="case-card-B" onclick="selectScenario('B')"
+            class="case-card text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all cursor-pointer">
+            <div class="font-extrabold text-sm text-[#0f2942] mb-1">📄 Caso B: Informe largo en PDF</div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Un reporte de 15 páginas de texto y tablas sobre rotación de personal que nadie termina de leer. <strong>Le falta Visualización.</strong>
+            </p>
+          </button>
+
+          <button type="button" id="case-card-C" onclick="selectScenario('C')"
+            class="case-card text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all cursor-pointer">
+            <div class="font-extrabold text-sm text-[#0f2942] mb-1">💼 Caso C: Un reporte de mi propio trabajo</div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Escribe un informe, correo o presentación real de tu empresa o universidad que quieras mejorar.
+            </p>
+          </button>
+        </div>
+
+        <!-- Caja amarilla con contexto del caso elegido -->
+        <div id="scenario-context" class="bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm text-amber-950 mb-6">
+          <strong>Contexto del Caso A:</strong> El gerente comercial ve en su tablero que las ventas cayeron un 8 % este trimestre, pero hay tantos filtros y gráficos sueltos que la reunión termina sin acuerdos claros.
+        </div>
+
+        <!-- 4 Campos guiados -->
+        <div class="space-y-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+            <label for="inp-report-name" class="block font-bold text-sm text-[#0f2942] mb-1">
+              Nombre del reporte que estás mejorando:
+            </label>
+            <input type="text" id="inp-report-name" value="Dashboard trimestral de ventas comerciales" oninput="updateReceipt()"
+              class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#0284c7]" />
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#16a34a] rounded-xl p-4">
+            <label for="inp-datos" class="block font-bold text-sm text-[#0f2942] mb-1">
+              1. 🗄️ ¿Qué DATO clave vas a mostrar? (La prueba)
+            </label>
+            <p class="text-xs text-slate-600 mb-2">
+              Ejemplo: <em>«El 72 % de la caída de ventas proviene de clientes antiguos de la zona norte que no renovaron su contrato.»</em>
+            </p>
+            <textarea id="inp-datos" rows="2" oninput="updateReceipt()"
+              placeholder="Escribe aquí el dato o evidencia principal que demuestra el problema..."
+              class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#16a34a]"></textarea>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#f59e0b] rounded-xl p-4">
+            <label for="inp-narrativa" class="block font-bold text-sm text-[#0f2942] mb-1">
+              2. 🎙️ ¿Qué NARRATIVA o mensaje vas a contar? (El qué y el para qué)
+            </label>
+            <p class="text-xs text-slate-600 mb-2">
+              Ejemplo: <em>«Estamos perdiendo clientes fieles por demoras en soporte técnico. Recomendamos asignar un ejecutivo de retención esta misma semana.»</em>
+            </p>
+            <textarea id="inp-narrativa" rows="2" oninput="updateReceipt()"
+              placeholder="Explica en 2 oraciones cuál es el problema y qué acción concreta recomiendas..."
+              class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#f59e0b]"></textarea>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#0284c7] rounded-xl p-4">
+            <label for="inp-visual" class="block font-bold text-sm text-[#0f2942] mb-1">
+              3. 📊 ¿Qué VISUALIZACIÓN vas a usar? (El gráfico)
+            </label>
+            <p class="text-xs text-slate-600 mb-2">
+              Ejemplo: <em>«Un gráfico de barras horizontales comparando la renovación por zona, resaltando en color naranja la zona norte para que se note en 3 segundos.»</em>
+            </p>
+            <textarea id="inp-visual" rows="2" oninput="updateReceipt()"
+              placeholder="Describe qué gráfico pondrías y qué resaltarías en color..."
+              class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#0284c7]"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caja inferior: Tu Respuesta Lista para Entregar -->
+      <div id="receipt-card" class="bg-white border-2 border-[#0f2942] rounded-2xl p-5 sm:p-7 shadow-md">
+        <div class="flex flex-wrap justify-between items-center gap-3 pb-4 mb-4 border-b border-slate-200">
+          <h2 class="text-lg sm:text-xl font-extrabold text-[#0f2942]">
+            ✅ Tu Respuesta Lista para Entregar
+          </h2>
+          <div class="flex flex-wrap gap-2.5 no-print">
+            <button type="button" onclick="copyToClipboard()"
+              class="bg-[#16a34a] hover:bg-green-700 text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer">
+              📋 Copiar respuesta para Moodle
+            </button>
+            <button type="button" onclick="window.print()"
+              class="bg-[#0f2942] hover:bg-slate-800 text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer">
+              🖨️ Guardar en PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-sm">
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="font-bold text-[#0f2942]">Reporte analizado:</span>
+            <span id="out-report-name" class="text-slate-800 ml-1">Dashboard trimestral de ventas comerciales</span>
+          </div>
+
+          <div class="bg-green-50/60 p-3.5 rounded-xl border border-green-200">
+            <strong class="block text-[#0f2942] mb-0.5">🗄️ 1. Pilar Datos (La prueba):</strong>
+            <span id="out-datos" class="text-slate-500 italic">(Completa el campo 1 arriba para verlo aquí...)</span>
+          </div>
+
+          <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200">
+            <strong class="block text-[#0f2942] mb-0.5">🎙️ 2. Pilar Narrativa (El mensaje y la acción):</strong>
+            <span id="out-narrativa" class="text-slate-500 italic">(Completa el campo 2 arriba para verlo aquí...)</span>
+          </div>
+
+          <div class="bg-sky-50/60 p-3.5 rounded-xl border border-sky-200">
+            <strong class="block text-[#0f2942] mb-0.5">📊 3. Pilar Visualización (El gráfico):</strong>
+            <span id="out-visual" class="text-slate-500 italic">(Completa el campo 3 arriba para verlo aquí...)</span>
+          </div>
+        </div>
+
+        <!-- Confirmación visual de copiado -->
+        <div id="copy-toast" class="hidden mt-4 bg-green-100 border border-green-300 text-green-900 px-4 py-3 rounded-xl text-sm font-medium">
+          ✓ <strong>¡Respuesta copiada al portapapeles!</strong> Ya puedes ir a Moodle y pegarla con <strong>Ctrl + V</strong> (o Clic derecho → Pegar).
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // NAVEGACIÓN ENTRE PESTAÑAS (1, 2, 3)
+    // =========================================================================
+    function switchTab(stepNumber) {
+      for (let i = 1; i <= 3; i++) {
+        const panel = document.getElementById('panel-' + i);
+        const btn = document.getElementById('tab-btn-' + i);
+        const badge = btn.querySelector('span:first-child');
+
+        if (i === stepNumber) {
+          panel.classList.add('active');
+          btn.classList.remove('border-transparent', 'text-slate-600');
+          btn.classList.add('border-[#0284c7]', 'bg-sky-50/70', 'text-[#0284c7]');
+          badge.classList.remove('bg-slate-200', 'text-slate-700');
+          badge.classList.add('bg-[#0284c7]', 'text-white');
+        } else {
+          panel.classList.remove('active');
+          btn.classList.add('border-transparent', 'text-slate-600');
+          btn.classList.remove('border-[#0284c7]', 'bg-sky-50/70', 'text-[#0284c7]');
+          badge.classList.add('bg-slate-200', 'text-slate-700');
+          badge.classList.remove('bg-[#0284c7]', 'text-white');
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // PESTAÑA 2: ACTUALIZACIÓN Y VALIDACIÓN DEL DIAGRAMA DE VENN
+    // =========================================================================
+    function updateLiveDiagram() {
+      const topVal = document.getElementById('sel-top').value;
+      const leftVal = document.getElementById('sel-left').value;
+      const rightVal = document.getElementById('sel-right').value;
+      const centerVal = document.getElementById('sel-center').value;
+
+      document.getElementById('svg-cruce-1').textContent = topVal || '¿Cruce 1?';
+      document.getElementById('svg-cruce-2').textContent = leftVal || '¿Cruce 2?';
+      document.getElementById('svg-cruce-3').textContent = rightVal || '¿Cruce 3?';
+
+      const l1 = document.getElementById('svg-centro-l1');
+      const l2 = document.getElementById('svg-centro-l2');
+
+      if (!centerVal) {
+        l1.textContent = '¿Centro?';
+        l2.textContent = '';
+      } else if (centerVal === 'Data Storytelling') {
+        l1.textContent = 'DATA';
+        l2.textContent = 'STORYTELLING';
+      } else if (centerVal === 'Solo un gráfico bonito') {
+        l1.textContent = 'Solo un';
+        l2.textContent = 'gráfico';
+      } else {
+        l1.textContent = 'Tabla de';
+        l2.textContent = 'Excel';
+      }
+    }
+
+    function checkDiagramAnswers() {
+      const leftVal = document.getElementById('sel-left').value;
+      const rightVal = document.getElementById('sel-right').value;
+      const topVal = document.getElementById('sel-top').value;
+      const centerVal = document.getElementById('sel-center').value;
+
+      const checks = [
+        { id: 'q-box-left', ok: leftVal === 'Explicar' },
+        { id: 'q-box-right', ok: rightVal === 'Iluminar' },
+        { id: 'q-box-top', ok: topVal === 'Comprometer' },
+        { id: 'q-box-center', ok: centerVal === 'Data Storytelling' }
+      ];
+
+      let score = 0;
+      checks.forEach(item => {
+        const box = document.getElementById(item.id);
+        box.classList.remove('border-green-400', 'bg-green-50/60', 'border-amber-400', 'bg-amber-50/60');
+        if (item.ok) {
+          score++;
+          box.classList.add('border-green-400', 'bg-green-50/60');
+        } else {
+          box.classList.add('border-amber-400', 'bg-amber-50/60');
+        }
+      });
+
+      const fb = document.getElementById('feedback-step-2');
+      fb.classList.remove('hidden', 'bg-green-100', 'border-green-300', 'text-green-950', 'bg-amber-100', 'border-amber-300', 'text-amber-950');
+
+      if (score === 4) {
+        fb.classList.add('bg-green-100', 'border', 'border-green-300', 'text-green-950');
+        fb.innerHTML = `
+          <strong>🎉 ¡Excelente trabajo! Completaste los 4 cruces correctamente:</strong>
+          <ul class="list-disc pl-5 mt-1.5 space-y-0.5">
+            <li><strong>Datos + Narrativa = Explicar</strong> (da contexto y significado).</li>
+            <li><strong>Datos + Visualización = Iluminar</strong> (hace visibles patrones y anomalías).</li>
+            <li><strong>Narrativa + Visualización = Comprometer</strong> (captura la atención y emociona).</li>
+            <li><strong>Los 3 juntos = Data Storytelling</strong> (el único punto donde se impulsa el cambio).</li>
+          </ul>
+          <p class="mt-2 font-semibold">¡Ya estás listo para avanzar al Paso 3!</p>
+        `;
+      } else {
+        fb.classList.add('bg-amber-100', 'border', 'border-amber-300', 'text-amber-950');
+        fb.innerHTML = `
+          <strong>🔎 Tienes ${score} de 4 respuestas correctas.</strong> Revisa las tarjetas marcadas en amarillo:
+          <ul class="list-disc pl-5 mt-1.5 space-y-0.5">
+            <li>Unir <em>Datos + Narrativa</em> sirve para <strong>Explicar</strong>.</li>
+            <li>Unir <em>Datos + Visualización</em> sirve para <strong>Iluminar</strong>.</li>
+            <li>Unir <em>Narrativa + Visualización</em> sirve para <strong>Comprometer</strong>.</li>
+          </ul>
+        `;
+      }
+    }
+
+    function resetDiagram() {
+      ['sel-left', 'sel-right', 'sel-top', 'sel-center'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      ['q-box-left', 'q-box-right', 'q-box-top', 'q-box-center'].forEach(id => {
+        document.getElementById(id).classList.remove('border-green-400', 'bg-green-50/60', 'border-amber-400', 'bg-amber-50/60');
+      });
+      document.getElementById('feedback-step-2').classList.add('hidden');
+      updateLiveDiagram();
+    }
+
+    // =========================================================================
+    // PESTAÑA 3: SELECCIÓN DE CASO Y GENERACIÓN DE FICHA EN TIEMPO REAL
+    // =========================================================================
+    function selectScenario(code) {
+      ['A', 'B', 'C'].forEach(c => {
+        const card = document.getElementById('case-card-' + c);
+        if (c === code) {
+          card.classList.remove('border-slate-200', 'bg-white');
+          card.classList.add('border-[#0284c7]', 'bg-sky-50/80');
+        } else {
+          card.classList.add('border-slate-200', 'bg-white');
+          card.classList.remove('border-[#0284c7]', 'bg-sky-50/80');
+        }
+      });
+
+      const ctxBox = document.getElementById('scenario-context');
+      const nameInput = document.getElementById('inp-report-name');
+
+      if (code === 'A') {
+        ctxBox.innerHTML = '<strong>Contexto del Caso A:</strong> El gerente comercial ve en su tablero que las ventas cayeron un 8 % este trimestre, pero hay tantos filtros y gráficos sueltos que la reunión termina sin acuerdos claros.';
+        nameInput.value = 'Dashboard trimestral de ventas comerciales';
+      } else if (code === 'B') {
+        ctxBox.innerHTML = '<strong>Contexto del Caso B:</strong> Recursos Humanos envió un documento PDF de 15 páginas lleno de párrafos y tablas sobre renuncias de personal, pero la gerencia no lo leyó por falta de tiempo.';
+        nameInput.value = 'Informe mensual de rotación de personal (PDF)';
+      } else {
+        ctxBox.innerHTML = '<strong>Contexto del Caso C:</strong> Piensa en un reporte, correo o presentación real de tu empresa o universidad que hoy sea difícil de entender o no logre convencer a quienes toman decisiones.';
+        nameInput.value = '';
+        nameInput.placeholder = 'Escribe aquí el nombre de tu reporte...';
+      }
+
+      updateReceipt();
+    }
+
+    function updateReceipt() {
+      const name = document.getElementById('inp-report-name').value.trim();
+      const datos = document.getElementById('inp-datos').value.trim();
+      const narrativa = document.getElementById('inp-narrativa').value.trim();
+      const visual = document.getElementById('inp-visual').value.trim();
+
+      document.getElementById('out-report-name').textContent = name || '(Sin nombre aún)';
+
+      const outD = document.getElementById('out-datos');
+      outD.textContent = datos || '(Completa el campo 1 arriba para verlo aquí...)';
+      outD.className = datos ? 'text-slate-800' : 'text-slate-500 italic';
+
+      const outN = document.getElementById('out-narrativa');
+      outN.textContent = narrativa || '(Completa el campo 2 arriba para verlo aquí...)';
+      outN.className = narrativa ? 'text-slate-800' : 'text-slate-500 italic';
+
+      const outV = document.getElementById('out-visual');
+      outV.textContent = visual || '(Completa el campo 3 arriba para verlo aquí...)';
+      outV.className = visual ? 'text-slate-800' : 'text-slate-500 italic';
+    }
+
+    function copyToClipboard() {
+      const text = [
+        'ACTIVIDAD SEMANA 1 · BLOQUE 3 — LOS TRES ELEMENTOS ESENCIALES DEL DATA STORYTELLING',
+        '• Reporte analizado: ' + document.getElementById('out-report-name').textContent,
+        '• 1. Pilar Datos (La prueba): ' + document.getElementById('out-datos').textContent,
+        '• 2. Pilar Narrativa (El mensaje y la acción): ' + document.getElementById('out-narrativa').textContent,
+        '• 3. Pilar Visualización (El gráfico): ' + document.getElementById('out-visual').textContent
+      ].join('\n');
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      const toast = document.getElementById('copy-toast');
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4500);
+    }
+  </script>
+</body>
+</html>
