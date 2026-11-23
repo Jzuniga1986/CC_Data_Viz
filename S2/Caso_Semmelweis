@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier Guiado | Caso #2026-HSC y Psicología del Data Storytelling (CertiProf DSTPC)</title>
+<style>
+  :root {
+    --navy: #0f2942;
+    --navy-light: #1e3a5f;
+    --teal: #0d9488;
+    --teal-soft: #ccfbf1;
+    --blue: #0284c7;
+    --blue-soft: #e0f2fe;
+    --amber: #b45309;
+    --amber-soft: #fef3c7;
+    --red: #b91c1c;
+    --red-soft: #fee2e2;
+    --green: #15803d;
+    --green-soft: #dcfce7;
+    --purple: #6d28d9;
+    --purple-soft: #ede9fe;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #475569;
+    --border: #cbd5e1;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Header Institucional */
+  header {
+    background: linear-gradient(135deg, #0f2942 0%, #163d61 100%);
+    color: #ffffff;
+    padding: 20px 18px;
+    border-bottom: 4px solid #0284c7;
+  }
+  .wrap { max-width: 1140px; margin: 0 auto; }
+  .badge-top {
+    display: inline-block;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  header h1 { margin: 0; font-size: 21px; font-weight: 800; }
+  header p { margin: 4px 0 0 0; font-size: 14px; color: #cbd5e1; }
+
+  /* Barra de Pestañas */
+  .tabs-bar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.05);
+  }
+  .tabs-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    padding: 0 10px;
+  }
+  .tab-btn {
+    flex: 1;
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 13px 9px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: #f8fafc; color: var(--navy); }
+  .tab-btn.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+    background: #f0f9ff;
+  }
+  .step-num {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .tab-btn.active .step-num { background: var(--blue); color: #ffffff; }
+
+  main { max-width: 1140px; margin: 20px auto 60px auto; padding: 0 16px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+  .card h2 { margin: 0 0 8px 0; font-size: 19px; color: var(--navy); }
+  .card h3 { margin: 0 0 8px 0; font-size: 16px; color: var(--navy); }
+
+  /* Barra de Equipo */
+  .team-bar {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--navy);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 14px;
+    align-items: center;
+  }
+  @media (max-width: 760px) { .team-bar { grid-template-columns: 1fr; } }
+
+  /* Cajas Pedagógicas de Ayuda */
+  .learn-banner {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 5px solid var(--blue);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin-bottom: 18px;
+    font-size: 14px;
+  }
+  .learn-banner strong.title { display: block; color: var(--navy); font-size: 15px; margin-bottom: 6px; }
+
+  .quote-card {
+    background: #0f2942;
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    border-left: 5px solid #38bdf8;
+  }
+  .quote-card blockquote {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-style: italic;
+  }
+  .quote-card cite {
+    font-size: 12.5px;
+    color: #93c5fd;
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .concept-pills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .c-pill {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .c-pill b { color: var(--navy); display: block; margin-bottom: 4px; font-size: 13.5px; }
+
+  /* Caja de Ejemplo Modelo */
+  .example-box {
+    background: #fffbeb;
+    border: 1px dashed #f59e0b;
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 13px;
+    color: #78350f;
+    margin-bottom: 10px;
+  }
+  .example-box b { color: #92400e; }
+
+  /* Grids y Tarjetas KPI */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 14px;
+  }
+
+  .kpi-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #f8fafc;
+  }
+  .kpi-box.red { background: #fef2f2; border-top: 4px solid var(--red); }
+  .kpi-box.green { background: #f0fdf4; border-top: 4px solid var(--green); }
+  .kpi-box.blue { background: #f0f9ff; border-top: 4px solid var(--blue); }
+  .kpi-val { font-size: 23px; font-weight: 800; color: var(--navy); line-height: 1.15; margin: 4px 0; }
+
+  /* Tabla comparativa Hechos vs Historias */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table.data-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  table.data-tbl th {
+    background: var(--navy);
+    color: #ffffff;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  table.data-tbl td {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data-tbl tr:nth-child(even) td { background: #f8fafc; }
+
+  /* Mini-experimento Bate y Bola */
+  .quiz-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 5px solid var(--purple);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .quiz-opt-btn {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    color: var(--navy);
+  }
+  .quiz-opt-btn:hover { border-color: var(--purple); background: var(--purple-soft); }
+  .quiz-feedback {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+
+  /* Formularios */
+  .field-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .field-box label {
+    display: block;
+    font-weight: 800;
+    font-size: 14.5px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .step-tag {
+    display: inline-block;
+    background: var(--navy);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13.5px;
+    background: #ffffff;
+    color: var(--text);
+  }
+  input[type="text"]:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(2,132,199,0.16);
+  }
+
+  /* Botones */
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .btn {
+    appearance: none;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn-blue { background: var(--blue); color: #ffffff; }
+  .btn-blue:hover { background: #0369a1; }
+  .btn-green { background: var(--green); color: #ffffff; }
+  .btn-green:hover { background: #166534; }
+  .btn-navy { background: var(--navy); color: #ffffff; }
+  .btn-navy:hover { background: var(--navy-light); }
+  .btn-amber { background: #d97706; color: #ffffff; }
+  .btn-amber:hover { background: #b45309; }
+  .btn-light { background: #ffffff; color: var(--navy); border: 1px solid var(--border); }
+  .btn-light:hover { background: #f1f5f9; }
+
+  /* Simulador Visual SVG */
+  .chart-stage {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  svg.viz-svg { width: 100%; max-width: 580px; height: auto; }
+
+  /* Dossier Final */
+  .dossier-sheet {
+    border: 2px solid var(--navy);
+    border-radius: 12px;
+    padding: 22px;
+    background: #ffffff;
+  }
+  .dossier-header {
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .quad-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 820px) { .quad-grid { grid-template-columns: 1fr; } }
+  .quad-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 14px;
+    background: #f8fafc;
+    font-size: 13px;
+  }
+  .quad-card h4 {
+    margin: 0 0 8px 0;
+    color: var(--navy);
+    font-size: 14.5px;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 5px;
+  }
+  .quad-card p { margin: 5px 0; }
+
+  .toast {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--green-soft);
+    border: 1px solid #86efac;
+    color: #14532d;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .toast.show { display: block; }
+
+  @media print {
+    .tabs-bar, .no-print, .team-bar { display: none !important; }
+    body { background: #ffffff; }
+    .panel { display: none !important; }
+    #tab-6 { display: block !important; }
+    .card { border: none; box-shadow: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge-top">SEMANA 2 · CERTIPROF DSTPC · CAPÍTULO 3 + CASO #2026-HSC</span>
+    <h1>La Psicología del Data Storytelling y Rediseño Neurocognitivo</h1>
+    <p>Domina la teoría del Capítulo 3 y aplícala paso a paso para resolver el Expediente Clínico-Analítico #2026-HSC.</p>
+  </div>
+</header>
+
+<nav class="tabs-bar" aria-label="Pasos del taller">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="openTab(0)">
+      <span class="step-num">0</span> Teoría (Cap. 3)
+    </button>
+    <button class="tab-btn" onclick="openTab(1)">
+      <span class="step-num">1</span> Lee el Caso
+    </button>
+    <button class="tab-btn" onclick="openTab(2)">
+      <span class="step-num">2</span> Autopsia Cognitiva
+    </button>
+    <button class="tab-btn" onclick="openTab(3)">
+      <span class="step-num">3</span> Diseña el Gráfico
+    </button>
+    <button class="tab-btn" onclick="openTab(4)">
+      <span class="step-num">4</span> Guion de Apertura
+    </button>
+    <button class="tab-btn" onclick="openTab(5)">
+      <span class="step-num">5</span> Defensa en Debate
+    </button>
+    <button class="tab-btn" onclick="openTab(6)">
+      <span class="step-num">✓</span> Entrega Final
+    </button>
+  </div>
+</nav>
+
+<main>
+  <!-- Barra persistente de identificación del equipo -->
+  <div class="team-bar no-print">
+    <div>
+      <label for="team-name" style="font-size:12px; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;">Nombre de tu Equipo:</label>
+      <input type="text" id="team-name" placeholder="Ej. Equipo 1 · Innovadores" oninput="syncAll()">
+    </div>
+    <div>
+      <label for="team-members" style="font-size:12px; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;">Nombres de los integrantes:</label>
+      <input type="text" id="team-members" placeholder="Escribe aquí los nombres de quienes participan..." oninput="syncAll()">
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 0: TEORÍA DEL CAPÍTULO 3 (CERTIPROF DSTPC)        -->
+  <!-- ========================================================= -->
+  <section id="tab-0" class="panel active">
+    <div class="learn-banner">
+      <strong class="title">🧠 Bienvenido al Capítulo 3: La Psicología del Data Storytelling</strong>
+      Antes de resolver el caso práctico del hospital, lee estos <strong>5 fundamentos oficiales</strong> de la Guía CertiProf DSTPC (basados en Brent Dykes, 2019). Entender cómo piensa el cerebro humano te dará las herramientas exactas para llenar las siguientes pestañas.
+    </div>
+
+    <!-- 1. La historia de Ignaz Semmelweis -->
+    <div class="card">
+      <h2>1. El Error de Ignaz Semmelweis (1818–1865): ¿Por qué los hechos no bastan?</h2>
+      <p style="font-size: 14px; margin-top: 0;">
+        En el Hospital General de Viena, el médico <strong>Ignaz Semmelweis</strong> descubrió tras meses de observaciones estadísticas que la mortalidad por «fiebre infantil» en la <strong>Clínica #1 (atendida por médicos, promedio 9.9%)</strong> era más del doble que en la <strong>Clínica #2 (atendida por parteras, promedio 3.9%)</strong>. Al introducir el lavado de manos con solución de cloro en mayo de 1847, la mortalidad cayó drásticamente por debajo del 2%.
+      </p>
+      <div class="kpi-box red" style="margin-bottom: 12px;">
+        <strong>¿Qué salió mal?</strong> Semmelweis presentó tablas y cifras frías asumiendo que <em>«los hechos iban a hablar por sí solos»</em>. Sus colegas médicos se sintieron culpados por las muertes, rechazaron sus datos, le revocaron su licencia en Austria y murió en un asilo antes de que su descubrimiento fuera aceptado.
+      </div>
+      <p style="font-size: 13.5px; color: var(--muted); margin-bottom: 0;">
+        <strong>Lección clave:</strong> El primer error de un analista es creer que las decisiones se basan únicamente en la lógica. Incluso audiencias muy analíticas toman decisiones influenciadas por sus <strong>emociones, creencias e identidad profesional</strong> (Antonio Damásio).
+      </p>
+    </div>
+
+    <!-- 2. Los Dos Sistemas de Kahneman y Tversky -->
+    <div class="card">
+      <h2>2. Los Dos Sistemas Cognitivos (Daniel Kahneman y Amos Tversky)</h2>
+      <p style="font-size: 14px; margin-top: 0;">
+        La economía del comportamiento demuestra que nuestra mente opera mediante dos sistemas con velocidades y esfuerzos distintos:
+      </p>
+
+      <div class="grid-2">
+        <div class="kpi-box" style="border-top: 4px solid var(--amber); background: #fffbeb;">
+          <h3 style="color: #92400e;">⚡ Sistema 1: El Piloto Automático</h3>
+          <ul style="font-size: 13.5px; margin: 6px 0 0 0; padding-left: 18px;">
+            <li><strong>Características:</strong> Rápido, intuitivo, emocional, automático y subconsciente.</li>
+            <li><strong>Cómo funciona:</strong> Usa <em>heurísticos</em> (atajos mentales) y busca causalidad inmediata para construir historias coherentes con pocos datos.</li>
+            <li><strong>Riesgo:</strong> «Brinca a conclusiones» sin verificar la calidad de los datos y reacciona a la defensiva cuando algo amenaza nuestras creencias.</li>
+          </ul>
+        </div>
+
+        <div class="kpi-box" style="border-top: 4px solid var(--blue); background: #f0f9ff;">
+          <h3 style="color: #075985;">🧭 Sistema 2: El Piloto Controlador (Perezoso)</h3>
+          <ul style="font-size: 13.5px; margin: 6px 0 0 0; padding-left: 18px;">
+            <li><strong>Características:</strong> Lento, analítico, lógico, esforzado y consciente.</li>
+            <li><strong>Cómo funciona:</strong> Evalúa tablas complejas, verifica estadísticas y razona paso a paso.</li>
+            <li><strong>Riesgo:</strong> Es «perezoso» y ahorra energía: si una tabla es difícil de leer o incomoda emocionalmente, delega la decisión al Sistema 1.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Experimento interactivo Bate y Bola -->
+      <div class="quiz-box">
+        <strong>🧪 Prueba tu propio Sistema 1 vs. Sistema 2 (Experimento de Kahneman):</strong>
+        <p style="margin: 6px 0; font-size: 14px;">
+          <em>«Un bate y una bola cuestan en total <strong>$1.10</strong>. El bate cuesta <strong>$1.00 más</strong> que la bola. ¿Cuánto cuesta la bola?»</em>
+        </p>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt-btn" onclick="checkQuiz('0.10')">$0.10 (10 centavos)</button>
+          <button type="button" class="quiz-opt-btn" onclick="checkQuiz('0.05')">$0.05 (5 centavos)</button>
+          <button type="button" class="quiz-opt-btn" onclick="checkQuiz('0.15')">$0.15 (15 centavos)</button>
+        </div>
+        <div id="quiz-res" class="quiz-feedback"></div>
+      </div>
+    </div>
+
+    <!-- 3. Procesadores de Historias y Acoplamiento Neuronal -->
+    <div class="card">
+      <h2>3. «La mente humana es un procesador de historias, no un procesador lógico»</h2>
+      <p style="font-size: 14px; margin-top: 0;">
+        El psicólogo social <strong>Jonathan Haidt</strong> y los experimentos de <strong>Fritz Heider y Marianne Simmel (1944)</strong> —donde 33 de 34 estudiantes inventaron historias humanas con emociones al ver simples triángulos y círculos moviéndose— demuestran que nuestro cerebro busca narrativas de forma natural.
+      </p>
+
+      <div class="concept-pills">
+        <div class="c-pill">
+          <b>🔗 Acoplamiento Neuronal (Neural Coupling)</b>
+          Ocurre cuando quien cuenta una historia y quienes la escuchan sincronizan su actividad cerebral. Las historias cambian la química mental y abren un camino para compartir comprensión.
+        </div>
+        <div class="c-pill">
+          <b>🛡️ Bajar la Guardia Intelectual (Jonathan Gottschall)</b>
+          <em>«Cuando leemos hechos, lo hacemos con las defensas altas y somos escépticos. Cuando somos absorbidos por una historia, bajamos nuestra guardia intelectual»</em>.
+        </div>
+        <div class="c-pill">
+          <b>🔥 Encender un Fuego (Plutarco)</b>
+          <em>«La mente no es una vasija para ser llenada [de datos], sino un fuego a ser encendido»</em>. Combinar datos, narrativa y visualización prepara el hallazgo para viajar por ambos sistemas.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Tabla comparativa: Hechos vs. Historias -->
+    <div class="card">
+      <h2>4. ¿Cómo reaccionamos a los Hechos vs. a las Historias? (Resumen Guía DSTPC)</h2>
+      <div class="table-wrap">
+        <table class="data-tbl">
+          <thead>
+            <tr>
+              <th style="width: 50%;">❌ Reacciones ante Hechos Aislados / Crudos</th>
+              <th style="width: 50%;">✅ Reacciones ante Historias con Datos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>No profundizamos en hechos que no nos gustan.</td>
+              <td>Las historias comprometen más nuestra mente.</td>
+            </tr>
+            <tr>
+              <td>Luchamos contra hechos conflictivos (como un diagnóstico incómodo).</td>
+              <td>Forman una conexión única entre quien comunica y el receptor.</td>
+            </tr>
+            <tr>
+              <td>Forzamos los hechos para sostener un sesgo preexistente (<em>sesgo de confirmación</em>).</td>
+              <td>Incrementan nuestra atención y empatía.</td>
+            </tr>
+            <tr>
+              <td>Los <strong>hechos correctivos</strong> (dar más tablas o valores <em>p</em>) refuerzan la oposición.</td>
+              <td>Nos hacen menos escépticos y más abiertos al cambio.</td>
+            </tr>
+            <tr>
+              <td><em>Nota clave:</em> Cuando los hechos son <strong>visualizados con claridad</strong>, es difícil negarlos.</td>
+              <td>Aumentan la comprensión y mueven hacia la acción.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-blue" onclick="openTab(1)">
+          Ya entendí la teoría &rarr; Ir al Paso 1: Lee el Caso del Hospital
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 1: LEE EL CASO (EXPEDIENTE #2026-HSC)             -->
+  <!-- ========================================================= -->
+  <section id="tab-1" class="panel">
+    <div class="learn-banner">
+      <strong class="title">👋 Tu misión en el caso práctico:</strong>
+      Ustedes son el nuevo equipo de <strong>Data Storytelling</strong> de la Red Hospitalaria Santa Clara. El analista anterior cometió el mismo error que Ignaz Semmelweis: presentó una tabla fría y los médicos la rechazaron. Revisa los datos del expediente y luego completa los pasos <strong>2, 3, 4 y 5</strong>.
+    </div>
+
+    <div class="card">
+      <h2>📁 Paso 1: Conoce el Caso — Hospital Santa Clara (#2026-HSC)</h2>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 14px;">
+        <strong>Institución:</strong> Red Hospitalaria Santa Clara (Hospital de Alta Especialidad) · <strong>Problema:</strong> Infecciones del Sitio Quirúrgico (ISQ).
+      </p>
+
+      <div class="grid-3" style="margin-bottom: 16px;">
+        <div class="kpi-box red">
+          <div style="font-size:12px; font-weight:700; color:var(--red);">EL PROBLEMA HUMANO</div>
+          <div class="kpi-val">328 pacientes</div>
+          <div style="font-size:13px; color:var(--muted);">Sufrieron infecciones evitables en el <strong>Pabellón A</strong> este año, y <strong>24 fallecieron</strong> por sepsis (contra solo 1 en el Pabellón B).</div>
+        </div>
+        <div class="kpi-box blue">
+          <div style="font-size:12px; font-weight:700; color:var(--blue);">EL COSTO PARA EL HOSPITAL</div>
+          <div class="kpi-val">$5,444,000 USD</div>
+          <div style="font-size:13px; color:var(--muted);">Sobrecosto evitable y 2,950 días-cama perdidos (alcanzaría para renovar <strong>2 quirófanos completos</strong>).</div>
+        </div>
+        <div class="kpi-box green">
+          <div style="font-size:12px; font-weight:700; color:var(--green);">LA CAUSA REAL DETECTADA</div>
+          <div class="kpi-val">32% vs. 96%</div>
+          <div style="font-size:13px; color:var(--muted);">Solo el 32% de cirujanos/docentes completaba el lavado quirúrgico por <strong>presión de tiempo entre cirugías</strong> (enfermería cumplía al 96%).</div>
+        </div>
+      </div>
+
+      <h3>La Evidencia Fallida: El Reporte Original del Analista</h3>
+      <p style="font-size: 14px; margin-top: 0;">
+        El analista anterior proyectó esta tabla llena de porcentajes y valores estadísticos (<em>p-valor</em>) y escribió al pie: <em>«Se concluye causalidad directa entre la baja adherencia del cuerpo médico senior y la morbilidad»</em>. Los cirujanos sintieron que los acusaban de negligencia, alegaron que sus pacientes eran más complejos y archivaron el reporte.
+      </p>
+
+      <div class="table-wrap">
+        <table class="data-tbl">
+          <thead>
+            <tr>
+              <th>Pabellón / Unidad</th>
+              <th>Cirugías</th>
+              <th>Infecciones (ISQ)</th>
+              <th>Tasa ISQ (%)</th>
+              <th>Reingreso UCI</th>
+              <th>Lavado / Asepsia</th>
+              <th>p-valor</th>
+              <th>Costo Reingreso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Pabellón A (Central / Docente)</strong></td>
+              <td>4,200</td>
+              <td>378</td>
+              <td>9.00%</td>
+              <td>4.29% (180 pac.)</td>
+              <td>48.5%</td>
+              <td>p &lt; 0.001</td>
+              <td>$14,800 USD</td>
+            </tr>
+            <tr>
+              <td><strong>Pabellón B (Ambulatorio)</strong></td>
+              <td>3,950</td>
+              <td>47</td>
+              <td>1.19%</td>
+              <td>0.35% (14 pac.)</td>
+              <td>94.2%</td>
+              <td>p &lt; 0.001</td>
+              <td>$3,200 USD</td>
+            </tr>
+            <tr>
+              <td>Servicio Traumatología (Pab. A)</td>
+              <td>1,450</td>
+              <td>162</td>
+              <td>11.17%</td>
+              <td>5.17% (75 pac.)</td>
+              <td>41.0%</td>
+              <td>p = 0.002</td>
+              <td>$16,500 USD</td>
+            </tr>
+            <tr>
+              <td>Servicio Cirugía General (Pab. A)</td>
+              <td>1,600</td>
+              <td>144</td>
+              <td>9.00%</td>
+              <td>4.12% (66 pac.)</td>
+              <td>51.2%</td>
+              <td>p = 0.014</td>
+              <td>$13,900 USD</td>
+            </tr>
+            <tr>
+              <td>Servicio Ginecobstetricia (Pab. A)</td>
+              <td>1,150</td>
+              <td>72</td>
+              <td>6.26%</td>
+              <td>3.39% (39 pac.)</td>
+              <td>53.8%</td>
+              <td>p = 0.038</td>
+              <td>$13,400 USD</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-light" onclick="openTab(0)">&larr; Repasar Teoría</button>
+        <button class="btn btn-blue" onclick="openTab(2)">Ir al Paso 2: Autopsia Cognitiva &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 2: PASO 2 — AUTOPSIA COGNITIVA                    -->
+  <!-- ========================================================= -->
+  <section id="tab-2" class="panel">
+    <div class="learn-banner">
+      <strong class="title">📘 ¿Qué debes hacer en esta pestaña?</strong>
+      Aplica lo que leíste en la <strong>Pestaña 0 (Teoría)</strong> para explicar qué pasó en la mente de los médicos del Pabellón A cuando vieron la tabla cruda. Cada cuadro tiene un ejemplo amarillo para guiarte.
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <h2 style="margin:0;">Paso 2: Ficha de Autopsia Cognitiva (Diagnóstico del Fracaso)</h2>
+        <button type="button" class="btn btn-amber" style="padding:7px 12px; font-size:12.5px;" onclick="fillExampleTab1()">
+          💡 Rellenar con ejemplo guía
+        </button>
+      </div>
+
+      <div class="field-box">
+        <span class="step-tag">Cuadro 1 de 4</span>
+        <label for="c1-semmelweis">¿Por qué falló la idea de que «los datos hablan por sí solos» (Error de Semmelweis)?</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Al igual que Semmelweis en Viena en 1847, el analista creyó que mostrar una tabla con p &lt; 0.001 bastaba para cambiar hábitos clínicos, sin notar que señalar el lavado de manos amenazaba la identidad profesional de los cirujanos».
+        </div>
+        <textarea id="c1-semmelweis" rows="3" placeholder="Escribe aquí con las palabras de tu equipo..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="field-box" style="border-left: 4px solid var(--red);">
+          <span class="step-tag" style="background:var(--red);">Cuadro 2 de 4</span>
+          <label for="c1-sys1">¿Cómo reaccionó su Sistema 1 (piloto automático / emocional)?</label>
+          <div class="example-box">
+            <strong>Ejemplo:</strong> «Sintieron una acusación moral ("nos dicen que matamos pacientes"), saltaron a una conclusión defensiva y activaron el sesgo de confirmación culpando a la gravedad de los casos».
+          </div>
+          <textarea id="c1-sys1" rows="3" placeholder="Escribe aquí la reacción emocional inmediata de los médicos..." oninput="syncAll()"></textarea>
+        </div>
+
+        <div class="field-box" style="border-left: 4px solid var(--amber);">
+          <span class="step-tag" style="background:var(--amber);">Cuadro 3 de 4</span>
+          <label for="c1-sys2">¿Por qué su Sistema 2 (piloto perezoso / analítico) no analizó los números?</label>
+          <div class="example-box">
+            <strong>Ejemplo:</strong> «Decodificar 8 columnas con chi-cuadrado y porcentajes exige alto esfuerzo mental; ante el malestar emocional, el Sistema 2 ahorró energía y delegó el rechazo al Sistema 1».
+          </div>
+          <textarea id="c1-sys2" rows="3" placeholder="Escribe aquí por qué evitaron revisar a fondo la tabla..." oninput="syncAll()"></textarea>
+        </div>
+      </div>
+
+      <div class="field-box" style="border-left: 4px solid var(--blue);">
+        <span class="step-tag" style="background:var(--blue);">Cuadro 4 de 4</span>
+        <label for="c1-paradoja">¿Por qué darles MÁS hechos correctivos empeora el rechazo y cómo reescribirías la premisa sin culparlos?</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Según el Capítulo 3, los hechos correctivos refuerzan la posición defensiva. Nueva premisa: "La alta rotación de cirugías en el Pabellón A impide completar el lavado quirúrgico; ajustar los intervalos protegerá a 328 pacientes al año"».
+        </div>
+        <textarea id="c1-paradoja" rows="3" placeholder="Escribe aquí por qué no sirven más tablas y cuál sería la nueva frase sin culpa..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-light" onclick="openTab(1)">&larr; Anterior: Lee el Caso</button>
+        <button class="btn btn-blue" onclick="openTab(3)">Ir al Paso 3: Diseña el Gráfico &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 3: PASO 3 — DISEÑA EL GRÁFICO                     -->
+  <!-- ========================================================= -->
+  <section id="tab-3" class="panel">
+    <div class="learn-banner">
+      <strong class="title">📘 ¿Qué debes hacer en esta pestaña?</strong>
+      Como dice la Guía DSTPC (Cap. 3), <em>«cuando los hechos son visualizados con claridad, es difícil negarlos»</em>. Elige un gráfico a la izquierda para sustituir la tabla de 8 columnas, escribe un título claro y justifica a la derecha por qué transformar porcentajes en vidas y costos funciona mejor.
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <h2 style="margin:0;">Paso 3: Artefacto Visual Rediseñado y Métricas Concretas</h2>
+        <button type="button" class="btn btn-amber" style="padding:7px 12px; font-size:12.5px;" onclick="fillExampleTab2()">
+          💡 Rellenar explicación de ejemplo
+        </button>
+      </div>
+
+      <div class="grid-2" style="align-items: start;">
+        <div class="chart-stage">
+          <div style="font-size: 12px; font-weight: 800; color: var(--navy); margin-bottom: 10px; text-transform: uppercase;">
+            1. Configura tu visualización principal
+          </div>
+
+          <div style="text-align: left; margin-bottom: 10px;">
+            <label for="c2-chart-type" style="font-size: 12.5px; font-weight: 700; color: var(--navy);">Elige el gráfico que mejor muestre el hallazgo:</label>
+            <select id="c2-chart-type" onchange="renderChart(); syncAll();">
+              <option value="dumbbell">Gráfico de Mancuernas: Compara % de Asepsia vs. % de Infección</option>
+              <option value="bars">Barras Ordenadas: Muestra qué servicio concentra más casos (Traumatología)</option>
+              <option value="waterfall">Gráfico de Cascada: Muestra los $5.44 millones USD en sobrecostos</option>
+              <option value="slope">Gráfico de Pendientes: Contrasta Pabellón B (estándar) vs. Pabellón A</option>
+            </select>
+          </div>
+
+          <div style="text-align: left; margin-bottom: 10px;">
+            <label for="c2-title" style="font-size: 12.5px; font-weight: 700; color: var(--navy);">Título explicativo del gráfico:</label>
+            <input type="text" id="c2-title" value="328 infecciones evitables y $5.44M USD en sobrecostos por brecha de tiempo en asepsia" oninput="renderChart(); syncAll();">
+          </div>
+
+          <div style="text-align: left; margin-bottom: 12px;">
+            <label for="c2-annotation" style="font-size: 12.5px; font-weight: 700; color: var(--navy);">Anotación directa dentro del gráfico (guía la mirada):</label>
+            <input type="text" id="c2-annotation" value="Traumatología (41% asepsia) concentra 162 casos ISQ por rotación rápida entre cirugías" oninput="renderChart(); syncAll();">
+          </div>
+
+          <div id="svg-container" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #ffffff;"></div>
+        </div>
+
+        <div>
+          <div class="field-box" style="border-left: 4px solid var(--green);">
+            <span class="step-tag" style="background:var(--green);">Pregunta 1 de 2</span>
+            <label for="c2-metrics">¿Por qué es mejor mostrar vidas, días-cama y dólares en lugar de solo porcentajes?</label>
+            <div class="example-box">
+              <strong>Ejemplo:</strong> «Decir "9% de infección" suena abstracto. Mostrar 24 vidas perdidas, 2,950 días-cama ocupados y $5.44M USD (equivalentes a renovar 2 quirófanos completos) conecta con la empatía y urgencia del comité».
+            </div>
+            <textarea id="c2-metrics" rows="4" placeholder="Explica cómo transformaste los porcentajes en impacto humano y económico..." oninput="syncAll()"></textarea>
+          </div>
+
+          <div class="field-box" style="border-left: 4px solid var(--blue);">
+            <span class="step-tag" style="background:var(--blue);">Pregunta 2 de 2</span>
+            <label for="c2-just-chart">¿Por qué elegiste ese gráfico en lugar de la tabla original?</label>
+            <div class="example-box">
+              <strong>Ejemplo:</strong> «Elimina el ruido visual de las 8 columnas, reduce el esfuerzo del Sistema 2 y resalta en rojo el foco crítico para que la brecha sea imposible de negar a simple vista».
+            </div>
+            <textarea id="c2-just-chart" rows="4" placeholder="Explica por qué ese gráfico facilita la lectura rápida..." oninput="syncAll()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-light" onclick="openTab(2)">&larr; Anterior: Autopsia Cognitiva</button>
+        <button class="btn btn-blue" onclick="openTab(4)">Ir al Paso 4: Guion de Apertura &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 4: PASO 4 — GUION DE APERTURA (CARRIL RÁPIDO)     -->
+  <!-- ========================================================= -->
+  <section id="tab-4" class="panel">
+    <div class="learn-banner">
+      <strong class="title">📘 ¿Qué debes hacer en esta pestaña?</strong>
+      Aplica el principio de <strong>Jonathan Gottschall</strong> y el <strong>acoplamiento neuronal</strong> (Pestaña 0): escribe los primeros 60 segundos hablados de tu presentación (una historia humana breve <em>antes</em> de proyectar gráficos) para que el comité baje su guardia intelectual.
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <h2 style="margin:0;">Paso 4: Guion de Apertura del «Carril Rápido» (0 a 60 segundos)</h2>
+        <button type="button" class="btn btn-amber" style="padding:7px 12px; font-size:12.5px;" onclick="fillExampleTab3()">
+          💡 Rellenar guion de ejemplo
+        </button>
+      </div>
+
+      <div class="field-box" style="border-left: 4px solid var(--teal);">
+        <span class="step-tag" style="background:var(--teal);">Cuadro 1 de 2</span>
+        <label for="c3-hook">Escribe el relato inicial de 60 segundos (el rostro humano ANTES de mostrar números):</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Colegas, antes de ver cifras, pensemos en Carlos, un paciente de 42 años operado en Traumatología. Su cirugía fue un éxito técnico, pero pasó 22 días en UCI por sepsis. Sabemos que ustedes operan contra reloj entre cirugías...».
+        </div>
+        <textarea id="c3-hook" rows="5" placeholder="Escribe aquí las palabras exactas con las que abrirías la reunión..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="field-box" style="border-left: 4px solid var(--amber);">
+        <span class="step-tag" style="background:var(--amber);">Cuadro 2 de 2</span>
+        <label for="c3-gottschall">¿Cómo logra esta historia el acoplamiento neuronal y baja la guardia intelectual (Gottschall)?</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Al validar primero la destreza quirúrgica de los médicos y la presión de horarios que enfrentan, la audiencia deja de sentirse atacada, sincroniza su atención con el caso humano y recibe el gráfico con apertura».
+        </div>
+        <textarea id="c3-gottschall" rows="3" placeholder="Explica por qué este inicio desarma la resistencia del comité..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-light" onclick="openTab(3)">&larr; Anterior: Diseña el Gráfico</button>
+        <button class="btn btn-blue" onclick="openTab(5)">Ir al Paso 5: Defensa en Debate &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 5: PASO 5 — DEFENSA EN DEBATE (CORTE APELACIONES) -->
+  <!-- ========================================================= -->
+  <section id="tab-5" class="panel">
+    <div class="learn-banner">
+      <strong class="title">📘 ¿Qué debes hacer en esta pestaña?</strong>
+      En la «Corte de Apelaciones», el otro equipo actuará como el <strong>Comité Escéptico (Sistema 1 a la defensiva)</strong> y lanzará estas 3 objeciones para defender su postura. Redacta las respuestas calibradas de tu equipo uniendo empatía y evidencia.
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <h2 style="margin:0;">Paso 5: Matriz de Defensa ante las 3 Críticas del Comité</h2>
+        <button type="button" class="btn btn-amber" style="padding:7px 12px; font-size:12.5px;" onclick="fillExampleTab4()">
+          💡 Rellenar respuestas de ejemplo
+        </button>
+      </div>
+
+      <div class="field-box">
+        <span class="step-tag">Crítica 1</span>
+        <label for="c4-resp1">Si dicen: «En el Pabellón A operamos casos más graves y con más comorbilidades que en el Pabellón B, por eso hay más infecciones»:</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Reconocemos la alta complejidad del Pabellón A; precisamente por ser pacientes más vulnerables, asegurar el lavado quirúrgico completo (hoy en 32% vs. 96% en Pabellón B) es aún más decisivo para proteger su recuperación».
+        </div>
+        <textarea id="c4-resp1" rows="2" placeholder="Escribe aquí la respuesta de tu equipo..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="field-box">
+        <span class="step-tag">Crítica 2</span>
+        <label for="c4-resp2">Si dicen: «Usar doble guante quirúrgico ya compensa que el lavado de manos sea más rápido»:</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «El doble guante es una barrera útil, pero los datos muestran que en Traumatología (donde el lavado completo cae al 41%) las infecciones suben al 11.17% y cada reingreso cuesta $16,500 USD».
+        </div>
+        <textarea id="c4-resp2" rows="2" placeholder="Escribe aquí la respuesta de tu equipo..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="field-box">
+        <span class="step-tag">Crítica 3</span>
+        <label for="c4-resp3">Si dicen: «No tenemos tiempo entre cirugías para protocolos largos o se atrasará toda la lista de espera»:</label>
+        <div class="example-box">
+          <strong>Ejemplo:</strong> «Las infecciones evitables hoy consumen 2,950 días-cama y $5.44M USD; destinar una fracción de ese ahorro a personal de apoyo entre cirugías agilizará la preparación sin atrasar la agenda».
+        </div>
+        <textarea id="c4-resp3" rows="2" placeholder="Escribe aquí la respuesta de tu equipo..." oninput="syncAll()"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-light" onclick="openTab(4)">&larr; Anterior: Guion de Apertura</button>
+        <button class="btn btn-green" onclick="openTab(6)">Ver Entrega Final Consolidada &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PESTAÑA 6: ENTREGA FINAL CONSOLIDADA                      -->
+  <!-- ========================================================= -->
+  <section id="tab-6" class="panel">
+    <div class="card">
+      <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+        <div>
+          <h2 style="margin: 0;">✅ Dossier Final de tu Equipo (Listo para Entregar)</h2>
+          <p style="margin: 4px 0 0 0; font-size: 13.5px; color: var(--muted);">Todo el trabajo del equipo quedó consolidado aquí. Pueden copiarlo para Moodle o guardarlo como PDF.</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-green" onclick="copyDossier()">📋 Copiar texto para Moodle</button>
+          <button class="btn btn-navy" onclick="window.print()">🖨️ Guardar en PDF / Imprimir</button>
+        </div>
+      </div>
+
+      <div id="copy-toast" class="toast no-print">
+        ✓ ¡Dossier copiado! Ahora ve a Moodle y pégalo con <strong>Ctrl + V</strong> (o Clic derecho &rarr; Pegar).
+      </div>
+
+      <div class="dossier-sheet" id="dossier-print-area">
+        <div class="dossier-header">
+          <div>
+            <div style="font-size: 11.5px; font-weight: 800; color: var(--blue); text-transform: uppercase;">CertiProf DSTPC · Semana 2 · Expediente #2026-HSC</div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--navy);">DOSSIER DE INTERVENCIÓN ESTRATÉGICA Y REDISEÑO NEUROCOGNITIVO</div>
+          </div>
+          <div style="text-align: right; font-size: 13px;">
+            <div><strong>Equipo:</strong> <span id="out-team">Sin especificar</span></div>
+            <div><strong>Integrantes:</strong> <span id="out-members">Sin especificar</span></div>
+          </div>
+        </div>
+
+        <div class="quad-grid">
+          <div class="quad-card" style="border-top: 4px solid var(--red);">
+            <h4>1. AUTOPSIA COGNITIVA (DIAGNÓSTICO)</h4>
+            <p><strong>Error de Semmelweis:</strong> <span id="out-c1-sem">Pendiente...</span></p>
+            <p><strong>Sistema 1 (Defensivo):</strong> <span id="out-c1-s1">Pendiente...</span></p>
+            <p><strong>Sistema 2 (Perezoso):</strong> <span id="out-c1-s2">Pendiente...</span></p>
+            <p><strong>Hechos correctivos y nueva premisa:</strong> <span id="out-c1-par">Pendiente...</span></p>
+          </div>
+
+          <div class="quad-card" style="border-top: 4px solid var(--blue);">
+            <h4>2. ARTEFACTO VISUAL REDISEÑADO</h4>
+            <p><strong>Gráfico elegido:</strong> <span id="out-c2-type">Gráfico de Mancuernas</span></p>
+            <p><strong>Título explicativo:</strong> <span id="out-c2-title">328 infecciones evitables...</span></p>
+            <p><strong>Conversión a datos concretos:</strong> <span id="out-c2-met">Pendiente...</span></p>
+            <p><strong>Justificación visual:</strong> <span id="out-c2-just">Pendiente...</span></p>
+          </div>
+
+          <div class="quad-card" style="border-top: 4px solid var(--teal);">
+            <h4>3. GUION DEL «CARRIL RÁPIDO» (0–60 SEG)</h4>
+            <p><strong>Gancho humano inicial:</strong> <span id="out-c3-hook">Pendiente...</span></p>
+            <p><strong>Desarme de guardia intelectual:</strong> <span id="out-c3-gott">Pendiente...</span></p>
+          </div>
+
+          <div class="quad-card" style="border-top: 4px solid var(--amber);">
+            <h4>4. MATRIZ DE DEFENSA EN DEBATE</h4>
+            <p><strong>Ante objeción de complejidad clínica:</strong> <span id="out-c4-r1">Pendiente...</span></p>
+            <p><strong>Ante objeción de doble guante:</strong> <span id="out-c4-r2">Pendiente...</span></p>
+            <p><strong>Ante objeción de falta de tiempo:</strong> <span id="out-c4-r3">Pendiente...</span></p>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; text-align: center;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 6px;">BOCETO VISUAL DEL EQUIPO</div>
+          <div id="dossier-svg-clone" style="max-width: 540px; margin: 0 auto;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  function openTab(idx) {
+    document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+    if (idx === 6) syncAll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function checkQuiz(ans) {
+    const res = document.getElementById('quiz-res');
+    res.style.display = 'block';
+    if (ans === '0.05') {
+      res.style.background = '#dcfce7';
+      res.style.border = '1px solid #86efac';
+      res.style.color = '#14532d';
+      res.innerHTML = '✅ <strong>¡Exacto! Activaste tu Sistema 2:</strong> La bola cuesta <strong>$0.05</strong> y el bate cuesta $1.05 ($1.00 más que la bola), sumando $1.10. El 80% de los estudiantes responde $0.10 porque el Sistema 1 brinca rápido a la conclusión.';
+    } else {
+      res.style.background = '#fef3c7';
+      res.style.border = '1px solid #fcd34d';
+      res.style.color = '#78350f';
+      res.innerHTML = '⚡ <strong>¡Ese fue tu Sistema 1 hablando!</strong> Si la bola costara $0.10 y el bate $1.00 más ($1.10), juntos costarían $1.20. La respuesta correcta es <strong>$0.05</strong> (bola $0.05 + bate $1.05 = $1.10).';
+    }
+  }
+
+  function fillExampleTab1() {
+    document.getElementById('c1-semmelweis').value = 'Al igual que Semmelweis en Viena en 1847, el analista asumió que una correlación estadística (p < 0.001) bastaba para cambiar hábitos médicos, sin notar que señalar el lavado de manos atacaba la identidad profesional de los cirujanos.';
+    document.getElementById('c1-sys1').value = 'Activó alarma y autodefensa ("nos dicen que matamos pacientes"), disparando el sesgo de confirmación para excusar las cifras con la gravedad de los casos.';
+    document.getElementById('c1-sys2').value = 'La tabla tenía 8 columnas con porcentajes y pruebas estadísticas complejas; ante la incomodidad emocional, el cerebro perezoso delegó el rechazo rápido al Sistema 1.';
+    document.getElementById('c1-paradoja').value = 'Agregar más hechos correctivos reforzaría su oposición. Nueva premisa: "La alta rotación de cirugías en el Pabellón A impide completar el tiempo de asepsia; optimizar los intervalos protegerá a 328 pacientes al año".';
+    syncAll();
+  }
+
+  function fillExampleTab2() {
+    document.getElementById('c2-metrics').value = 'Pasar de porcentajes impersonales (9.00% vs. 1.19%) a 328 infecciones evitables, 24 vidas perdidas y $5.44M USD (equivalentes a 2 quirófanos nuevos) hace visible el impacto real.';
+    document.getElementById('c2-just-chart').value = 'El gráfico seleccionado elimina el ruido de la tabla cruda, muestra el Pabellón B como punto de referencia y enfoca la mirada de inmediato en la brecha crítica de Traumatología y Pabellón A.';
+    syncAll();
+  }
+
+  function fillExampleTab3() {
+    document.getElementById('c3-hook').value = 'Colegas, antes de ver cifras, pensemos en Carlos, un paciente de 42 años operado en Traumatología. Su cirugía fue un éxito técnico, pero pasó 22 días en UCI por sepsis. Sabemos que ustedes operan contra reloj entre cirugías...';
+    document.getElementById('c3-gottschall').value = 'Al abrir reconociendo la excelencia técnica de los cirujanos y la presión horaria que enfrentan, dejamos de señalar culpables, generamos acoplamiento neuronal y bajamos su guardia intelectual.';
+    syncAll();
+  }
+
+  function fillExampleTab4() {
+    document.getElementById('c4-resp1').value = 'Reconocemos que el Pabellón A atiende casos más complejos; precisamente por ser pacientes más vulnerables, asegurar el lavado quirúrgico completo (hoy en 32% vs. 96%) es vital para proteger el éxito de su cirugía.';
+    document.getElementById('c4-resp2').value = 'El doble guante reduce riesgos, pero en Traumatología (donde el lavado completo es de 41%) las infecciones suben a 11.17% y cada reingreso cuesta $16,500 USD y semanas de recuperación.';
+    document.getElementById('c4-resp3').value = 'Las infecciones evitables hoy consumen 2,950 días-cama y $5.44M USD; destinar una fracción de ese ahorro a personal de apoyo entre cirugías agilizará los tiempos sin retrasar la lista de espera.';
+    syncAll();
+  }
+
+  function renderChart() {
+    const type = document.getElementById('c2-chart-type').value;
+    const title = document.getElementById('c2-title').value || 'Título explicativo del hallazgo';
+    const ann = document.getElementById('c2-annotation').value || 'Anotación clave';
+    const container = document.getElementById('svg-container');
+
+    let bodySvg = '';
+    if (type === 'dumbbell') {
+      bodySvg = `
+        <text x="20" y="52" font-size="11" fill="#475569" font-weight="700">Comparación de Adherencia a Asepsia (%) vs. Tasa ISQ (%)</text>
+        <line x1="150" y1="85" x2="500" y2="85" stroke="#cbd5e1" stroke-width="2"/>
+        <text x="25" y="89" font-size="11.5" fill="#1e293b" font-weight="700">Pabellón B (Estándar)</text>
+        <circle cx="480" cy="85" r="7" fill="#15803d"/><text x="480" y="73" text-anchor="middle" font-size="10" fill="#15803d" font-weight="700">94.2% Asepsia</text>
+        <circle cx="165" cy="85" r="7" fill="#0284c7"/><text x="165" y="73" text-anchor="middle" font-size="10" fill="#0284c7" font-weight="700">1.19% ISQ</text>
+
+        <line x1="150" y1="135" x2="500" y2="135" stroke="#fca5a5" stroke-width="3"/>
+        <text x="25" y="139" font-size="11.5" fill="#1e293b" font-weight="700">Pabellón A (Global)</text>
+        <circle cx="320" cy="135" r="7" fill="#d97706"/><text x="320" y="123" text-anchor="middle" font-size="10" fill="#d97706" font-weight="700">48.5% Asepsia</text>
+        <circle cx="215" cy="135" r="7" fill="#dc2626"/><text x="215" y="123" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">9.00% ISQ</text>
+
+        <line x1="150" y1="185" x2="500" y2="185" stroke="#fca5a5" stroke-width="3"/>
+        <text x="25" y="189" font-size="11.5" fill="#991b1b" font-weight="800">Traumatología (Pab. A)</text>
+        <circle cx="290" cy="185" r="8" fill="#d97706"/><text x="290" y="173" text-anchor="middle" font-size="10" fill="#d97706" font-weight="700">41.0% Asepsia</text>
+        <circle cx="235" cy="185" r="8" fill="#dc2626"/><text x="235" y="173" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">11.17% ISQ</text>
+      `;
+    } else if (type === 'bars') {
+      bodySvg = `
+        <text x="20" y="52" font-size="11" fill="#475569" font-weight="700">Casos de Infección (ISQ) por Unidad vs. Línea Base Esperada</text>
+        <rect x="170" y="72" width="42" height="22" fill="#94a3b8" rx="3"/><text x="25" y="87" font-size="11" fill="#334155">Pabellón B (Ref.)</text><text x="218" y="87" font-size="11" fill="#334155" font-weight="700">47 casos (1.19%)</text>
+        <rect x="170" y="106" width="65" height="22" fill="#0284c7" rx="3"/><text x="25" y="121" font-size="11" fill="#334155">Ginecobstetricia A</text><text x="241" y="121" font-size="11" fill="#0284c7" font-weight="700">72 casos</text>
+        <rect x="170" y="140" width="130" height="22" fill="#0284c7" rx="3"/><text x="25" y="155" font-size="11" fill="#334155">Cirugía General A</text><text x="306" y="155" font-size="11" fill="#0284c7" font-weight="700">144 casos</text>
+        <rect x="170" y="174" width="148" height="22" fill="#dc2626" rx="3"/><text x="25" y="189" font-size="11" fill="#991b1b" font-weight="800">Traumatología A</text><text x="324" y="189" font-size="11" fill="#dc2626" font-weight="800">162 casos (Crítico)</text>
+        <line x1="212" y1="66" x2="212" y2="202" stroke="#15803d" stroke-width="2" stroke-dasharray="4 3"/>
+      `;
+    } else if (type === 'waterfall') {
+      bodySvg = `
+        <text x="20" y="52" font-size="11" fill="#475569" font-weight="700">Impacto Presupuestario Anual por Infecciones ISQ (USD)</text>
+        <rect x="65" y="175" width="75" height="22" fill="#15803d" rx="3"/><text x="102" y="168" text-anchor="middle" font-size="10.5" fill="#15803d" font-weight="700">$150.4K</text><text x="102" y="210" text-anchor="middle" font-size="10" fill="#334155">Costo Pab. B</text>
+        <rect x="220" y="75" width="75" height="100" fill="#dc2626" rx="3"/><text x="257" y="68" text-anchor="middle" font-size="10.5" fill="#dc2626" font-weight="800">+$5,444,000</text><text x="257" y="210" text-anchor="middle" font-size="10" fill="#991b1b" font-weight="700">Sobrecosto Evitable</text>
+        <rect x="375" y="75" width="75" height="122" fill="#0f2942" rx="3"/><text x="412" y="68" text-anchor="middle" font-size="10.5" fill="#0f2942" font-weight="800">$5,594,400</text><text x="412" y="210" text-anchor="middle" font-size="10" fill="#334155">Total Pab. A</text>
+      `;
+    } else {
+      bodySvg = `
+        <text x="20" y="52" font-size="11" fill="#475569" font-weight="700">Divergencia entre Pabellón B (Estándar) y Pabellón A (Docente)</text>
+        <line x1="140" y1="70" x2="140" y2="195" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="400" y1="70" x2="400" y2="195" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="140" y1="175" x2="400" y2="90" stroke="#dc2626" stroke-width="3.5"/>
+        <circle cx="140" cy="175" r="6" fill="#15803d"/><text x="130" y="179" text-anchor="end" font-size="11" fill="#15803d" font-weight="700">1.19% ISQ (Pab. B)</text>
+        <circle cx="400" cy="90" r="6" fill="#dc2626"/><text x="410" y="94" text-anchor="start" font-size="11" fill="#dc2626" font-weight="800">9.00% ISQ (Pab. A)</text>
+        <line x1="140" y1="85" x2="400" y2="155" stroke="#d97706" stroke-width="3" stroke-dasharray="5 3"/>
+        <text x="130" y="88" text-anchor="end" font-size="10.5" fill="#475569">94.2% Asepsia</text>
+        <text x="410" y="159" text-anchor="start" font-size="10.5" fill="#d97706" font-weight="700">48.5% Asepsia</text>
+      `;
+    }
+
+    const svgHtml = `
+      <svg class="viz-svg" viewBox="0 0 560 255" role="img" aria-label="Boceto visual del caso">
+        <rect x="0" y="0" width="560" height="255" fill="#ffffff"/>
+        <text x="20" y="26" font-size="13" fill="#0f2942" font-weight="800">${escapeHtml(title.substring(0, 74))}</text>
+        <line x1="20" y1="34" x2="540" y2="34" stroke="#e2e8f0" stroke-width="1"/>
+        ${bodySvg}
+        <rect x="20" y="218" width="520" height="28" rx="5" fill="#fef3c7" stroke="#fcd34d"/>
+        <text x="30" y="236" font-size="11" fill="#92400e" font-weight="700">📌 Anotación: ${escapeHtml(ann.substring(0, 78))}</text>
+      </svg>
+    `;
+    container.innerHTML = svgHtml;
+    const clone = document.getElementById('dossier-svg-clone');
+    if (clone) clone.innerHTML = svgHtml;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function syncAll() {
+    document.getElementById('out-team').textContent = document.getElementById('team-name').value || 'Sin especificar';
+    document.getElementById('out-members').textContent = document.getElementById('team-members').value || 'Sin especificar';
+
+    document.getElementById('out-c1-sem').textContent = document.getElementById('c1-semmelweis').value || 'Pendiente...';
+    document.getElementById('out-c1-s1').textContent = document.getElementById('c1-sys1').value || 'Pendiente...';
+    document.getElementById('out-c1-s2').textContent = document.getElementById('c1-sys2').value || 'Pendiente...';
+    document.getElementById('out-c1-par').textContent = document.getElementById('c1-paradoja').value || 'Pendiente...';
+
+    const sel = document.getElementById('c2-chart-type');
+    document.getElementById('out-c2-type').textContent = sel.options[sel.selectedIndex].text;
+    document.getElementById('out-c2-title').textContent = document.getElementById('c2-title').value || 'Pendiente...';
+    document.getElementById('out-c2-met').textContent = document.getElementById('c2-metrics').value || 'Pendiente...';
+    document.getElementById('out-c2-just').textContent = document.getElementById('c2-just-chart').value || 'Pendiente...';
+
+    document.getElementById('out-c3-hook').textContent = document.getElementById('c3-hook').value || 'Pendiente...';
+    document.getElementById('out-c3-gott').textContent = document.getElementById('c3-gottschall').value || 'Pendiente...';
+
+    document.getElementById('out-c4-r1').textContent = document.getElementById('c4-resp1').value || 'Pendiente...';
+    document.getElementById('out-c4-r2').textContent = document.getElementById('c4-resp2').value || 'Pendiente...';
+    document.getElementById('out-c4-r3').textContent = document.getElementById('c4-resp3').value || 'Pendiente...';
+  }
+
+  function copyDossier() {
+    syncAll();
+    const lines = [
+      'DOSSIER DE INTERVENCIÓN ESTRATÉGICA Y REDISEÑO NEUROCOGNITIVO (CASO #2026-HSC)',
+      'Equipo: ' + document.getElementById('out-team').textContent,
+      'Integrantes: ' + document.getElementById('out-members').textContent,
+      '',
+      '1. AUTOPSIA COGNITIVA',
+      '• Error de Semmelweis: ' + document.getElementById('out-c1-sem').textContent,
+      '• Sistema 1 (Defensivo): ' + document.getElementById('out-c1-s1').textContent,
+      '• Sistema 2 (Perezoso): ' + document.getElementById('out-c1-s2').textContent,
+      '• Paradoja de hechos correctivos y nueva premisa: ' + document.getElementById('out-c1-par').textContent,
+      '',
+      '2. ARTEFACTO VISUAL REDISEÑADO',
+      '• Gráfico seleccionado: ' + document.getElementById('out-c2-type').textContent,
+      '• Título explicativo: ' + document.getElementById('out-c2-title').textContent,
+      '• Anotación narrativa: ' + document.getElementById('c2-annotation').value,
+      '• Conversión de datos abstractos a concretos: ' + document.getElementById('out-c2-met').textContent,
+      '• Justificación visual: ' + document.getElementById('out-c2-just').textContent,
+      '',
+      '3. GUION DEL CARRIL RÁPIDO (0-60 SEG)',
+      '• Gancho humano: ' + document.getElementById('out-c3-hook').textContent,
+      '• Desarme de guardia intelectual: ' + document.getElementById('out-c3-gott').textContent,
+      '',
+      '4. MATRIZ DE DEFENSA EN DEBATE',
+      '• Crítica 1 (Complejidad clínica): ' + document.getElementById('out-c4-r1').textContent,
+      '• Crítica 2 (Doble guante): ' + document.getElementById('out-c4-r2').textContent,
+      '• Crítica 3 (Falta de tiempo): ' + document.getElementById('out-c4-r3').textContent
+    ];
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const t = document.getElementById('copy-toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 4500);
+    });
+  }
+
+  renderChart();
+</script>
+</body>
+</html>
